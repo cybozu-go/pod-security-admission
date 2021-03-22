@@ -38,25 +38,25 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("invalid webhook address: %s, %v", config.webhookAddr, err)
 		}
-		conf, err := parseConfig(config.configPath)
+		profs, err := parseProfiles(config.configPath)
 		if err != nil {
 			return err
 		}
-		return run(h, numPort, conf)
+		return run(h, numPort, profs)
 	},
 }
 
-func parseConfig(configPath string) (*hooks.Config, error) {
+func parseProfiles(configPath string) ([]hooks.SecurityProfile, error) {
 	data, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		return nil, err
 	}
-	var conf hooks.Config
-	err = yaml.Unmarshal(data, &conf)
+	var profs []hooks.SecurityProfile
+	err = yaml.Unmarshal(data, &profs)
 	if err != nil {
 		return nil, err
 	}
-	return &conf, nil
+	return profs, nil
 }
 
 // Execute executes the command.

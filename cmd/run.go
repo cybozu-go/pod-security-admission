@@ -22,7 +22,7 @@ func init() {
 	// +kubebuilder:scaffold:scheme
 }
 
-func run(addr string, port int, conf *hooks.Config) error {
+func run(addr string, port int, profs []hooks.SecurityProfile) error {
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&config.zapOpts)))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
@@ -43,8 +43,10 @@ func run(addr string, port int, conf *hooks.Config) error {
 	// admission.NewDecoder never returns non-nil error
 	dec, _ := admission.NewDecoder(scheme)
 	wh := mgr.GetWebhookServer()
-	wh.Register("/mutate-pod", hooks.NewPodMutator(mgr.GetClient(), dec))
-	wh.Register("/validate-pod", hooks.NewPodValidator(mgr.GetClient(), dec))
+	for _, prof := range profs{
+		wh.Register("/mutate-" + prof.Name, hooks.NewPodMutator(mgr.GetClient(), dec, prof.Mutators))
+		wh.Register("/validate-" + prof.Name, hooks.NewPodValidator(mgr.GetClient(), dec, prof.Validators))
+	}
 
 	// +kubebuilder:scaffold:builder
 

@@ -13,11 +13,11 @@ By default, the following configuration is used:
   validators:
     - denyHostNamespace
     - denyPrivilegedContainers
-    - denyCapabilities
+    - denyBeyondDefaultCapabilities
     - denyHostPathVolumes
     - denyHostPorts
     - allowOnlyDefaultAppArmor
-    - denySELinux
+    - denyCustomSELinux
     - allowOnlyDefaultProcMount
     - allowOnlySafeSysctls
   mutators: []
@@ -40,11 +40,11 @@ administrators can add the rules under the `Baseline` section:
   validators:
     - denyHostNamespace
     - denyPrivilegedContainers
-    - denyCapabilities
+    - denyBeyondDefaultCapabilities
     - denyHostPathVolumes
     - denyHostPorts
     - allowOnlyDefaultAppArmor
-    - denySELinux
+    - denyCustomSELinux
     - allowOnlyDefaultProcMount
     - allowOnlySafeSysctls
     - denyRunAsRoot
