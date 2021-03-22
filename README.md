@@ -8,14 +8,14 @@ Pod Security Admission
 
 **Project Status**: Initial development
 
-`pod-security-admission` is a Kubernetes [admission webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to ensure [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/).
+`pod-security-admission` is composed of [validation and mutating admission webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to ensure [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/).
 
 The enforcement of security settings for Pods has previously been achieved using [Pod Security Policy (PSP)](https://kubernetes.io/docs/concepts/policy/pod-security-policy/).
 However, it was [announced](https://github.com/kubernetes/kubernetes/pull/97171) that PSP is going to be removed in Kubernetes 1.25.
 
 `pod-security-admission` provides an enforcement of [simple Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) as admission webhook.
 
-`pod-security-admission` is not a policy engine.
+`pod-security-admission` is not a policy engine and users cannot write their own policies flexibly.
 It does not provide flexible policy changes.
 If you want to do that, I recommend using a policy engine such as [OPA GateKeeper](https://github.com/open-policy-agent/gatekeeper).
 
@@ -27,7 +27,7 @@ Webhooks
 ### Privileged
 
 The `Privileged` is an entirely unrestricted policy.
-Admission webhook will not work to Pods to which this policy is applied.
+Admission webhook does nothing to the Pods in namespaces with `Privileged` label.
 This policy should be applied to the Pods that are the core components for the Kubernetes cluster, such as network plugins.
 
 This policy will be applied to Pods that belong to namespaces with the following label:

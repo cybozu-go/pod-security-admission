@@ -6,7 +6,7 @@ Customize Policy
 
 You can customize the rules for each policy.
 
-By default, the following configuration are used:
+By default, the following configuration is used:
 
 ```yaml
 - name: baseline
@@ -32,7 +32,8 @@ By default, the following configuration are used:
     - mutateRunAsNonRoot
 ```
 
-For example, if you want to enforce `denyRunAsRoot` and `mutateRunAsNonRoot` in `Baseline`, you can specify the configuration as follows:
+For example, if you want to enforce `denyRunAsRoot` and `mutateRunAsNonRoot` in `Baseline`,
+administrators can add the rules under the `Baseline` section: 
 
 ```yaml
 - name: baseline
