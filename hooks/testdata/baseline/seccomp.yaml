@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: seccomp
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: "Localhost"
+      localhostProfile: profiles/audit.json
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu

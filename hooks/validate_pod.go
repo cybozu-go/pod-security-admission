@@ -49,20 +49,20 @@ func (v *podValidator) Handle(ctx context.Context, req admission.Request) admiss
 type Validator func(pod *corev1.Pod) admission.Response
 
 var validators = map[string]Validator{
-	"denyHostNamespace":             denyHostNamespace,
-	"denyPrivilegedContainers":      denyPrivilegedContainers,
-	"denyBeyondDefaultCapabilities": denyBeyondDefaultCapabilities,
-	"denyHostPathVolumes":           denyHostPathVolumes,
-	"denyHostPorts":                 denyHostPorts,
-	"allowOnlyDefaultAppArmor":      allowOnlyDefaultAppArmor,
-	"denyCustomSELinux":             denyCustomSELinux,
-	"allowOnlyDefaultProcMount":     allowOnlyDefaultProcMount,
-	"allowOnlySafeSysctls":          allowOnlySafeSysctls,
-	"denyNonCoreVolumeTypes":        denyNonCoreVolumeTypes,
-	"denyPrivilegeEscalation":       denyPrivilegeEscalation,
-	"denyRunAsRoot":                 denyRunAsRoot,
-	"denyRootGroups":                denyRootGroups,
-	"allowOnlyDefaultSeccomp":       allowOnlyDefaultSeccomp,
+	"deny-host-namespace":        denyHostNamespace,
+	"deny-privileged-containers": denyPrivilegedContainers,
+	"deny-unsafe-capabilities":   denyUnsafeCapabilities,
+	"deny-host-path-volumes":     denyHostPathVolumes,
+	"deny-host-ports":            denyHostPorts,
+	"deny-unsafe-apparmor":       denyUnsafeAppArmor,
+	"deny-unsafe-selinux":        denyUnsafeSELinux,
+	"deny-unsafe-proc-mount":     denyUnsafeProcMount,
+	"deny-unsafe-sysctls":        denyUnsafeSysctls,
+	"deny-non-core-volume-types": denyNonCoreVolumeTypes,
+	"deny-privilege-escalation":  denyPrivilegeEscalation,
+	"deny-run-as-root":           denyRunAsRoot,
+	"deny-root-groups":           denyRootGroups,
+	"deny-unsafe-seccomp":        denyUnsafeSeccomp,
 }
 
 func denyHostNamespace(pod *corev1.Pod) admission.Response {
@@ -120,7 +120,7 @@ func containsString(list []string, item string) bool {
 	return false
 }
 
-func denyBeyondDefaultCapabilities(pod *corev1.Pod) admission.Response {
+func denyUnsafeCapabilities(pod *corev1.Pod) admission.Response {
 	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
 	copy(containers, pod.Spec.Containers)
 	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
@@ -166,7 +166,7 @@ func denyHostPorts(pod *corev1.Pod) admission.Response {
 	return admission.Allowed("ok")
 }
 
-func allowOnlyDefaultAppArmor(pod *corev1.Pod) admission.Response {
+func denyUnsafeAppArmor(pod *corev1.Pod) admission.Response {
 	for k, v := range pod.Annotations {
 		if strings.HasPrefix(k, corev1.AppArmorBetaContainerAnnotationKeyPrefix) &&
 			v != corev1.AppArmorBetaProfileRuntimeDefault {
@@ -176,7 +176,7 @@ func allowOnlyDefaultAppArmor(pod *corev1.Pod) admission.Response {
 	return admission.Allowed("ok")
 }
 
-func denyCustomSELinux(pod *corev1.Pod) admission.Response {
+func denyUnsafeSELinux(pod *corev1.Pod) admission.Response {
 	if pod.Spec.SecurityContext != nil && pod.Spec.SecurityContext.SELinuxOptions != nil {
 		return admission.Denied("Setting custom SELinux options is not allowed")
 	}
@@ -193,7 +193,7 @@ func denyCustomSELinux(pod *corev1.Pod) admission.Response {
 	return admission.Allowed("ok")
 }
 
-func allowOnlyDefaultProcMount(pod *corev1.Pod) admission.Response {
+func denyUnsafeProcMount(pod *corev1.Pod) admission.Response {
 	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
 	copy(containers, pod.Spec.Containers)
 	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
@@ -217,7 +217,7 @@ var allowedSysctls = []string{
 	"net.ipv4.ping_group_range",
 }
 
-func allowOnlySafeSysctls(pod *corev1.Pod) admission.Response {
+func denyUnsafeSysctls(pod *corev1.Pod) admission.Response {
 	if pod.Spec.SecurityContext == nil {
 		return admission.Allowed("ok")
 	}
@@ -289,30 +289,31 @@ func denyRunAsRoot(pod *corev1.Pod) admission.Response {
 		return admission.Allowed("ok")
 	}
 
-	if pod.Spec.SecurityContext == nil {
-		return admission.Denied("RunAsNonRoot must be true")
-	}
-	if res := validate(pod.Spec.SecurityContext.RunAsNonRoot, pod.Spec.SecurityContext.RunAsUser); !res.Allowed {
-		return res
-	}
-
 	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
 	copy(containers, pod.Spec.Containers)
 	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
 
+	allContainersAllowed := true
 	for _, container := range containers {
-		if container.SecurityContext == nil {
-			return admission.Denied("RunAsNonRoot must be true")
+		if container.SecurityContext == nil || (container.SecurityContext.RunAsNonRoot == nil && container.SecurityContext.RunAsUser == nil) {
+			allContainersAllowed = false
+			continue
 		}
 		if res := validate(container.SecurityContext.RunAsNonRoot, container.SecurityContext.RunAsUser); !res.Allowed {
 			return res
 		}
 	}
-	return admission.Allowed("ok")
+	if allContainersAllowed {
+		return admission.Allowed("ok")
+	}
+
+	if pod.Spec.SecurityContext == nil {
+		return admission.Denied("RunAsNonRoot must be true")
+	}
+	return validate(pod.Spec.SecurityContext.RunAsNonRoot, pod.Spec.SecurityContext.RunAsUser)
 }
 
 func denyRootGroups(pod *corev1.Pod) admission.Response {
-
 	if pod.Spec.SecurityContext != nil {
 		if pod.Spec.SecurityContext.RunAsGroup != nil && *pod.Spec.SecurityContext.RunAsGroup == 0 {
 			return admission.Denied("Running with the root GID is forbidden")
@@ -342,7 +343,7 @@ func denyRootGroups(pod *corev1.Pod) admission.Response {
 	return admission.Allowed("ok")
 }
 
-func allowOnlyDefaultSeccomp(pod *corev1.Pod) admission.Response {
+func denyUnsafeSeccomp(pod *corev1.Pod) admission.Response {
 	if pod.Spec.SecurityContext != nil && pod.Spec.SecurityContext.SeccompProfile != nil && pod.Spec.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
 		return admission.Denied(fmt.Sprintf("%s is not an allowed seccomp prifile", pod.Spec.SecurityContext.SeccompProfile.Type))
 	}

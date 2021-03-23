@@ -1,4 +1,3 @@
-
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: MutatingWebhookConfiguration
@@ -6,27 +5,58 @@ metadata:
   creationTimestamp: null
   name: mutating-webhook-configuration
 webhooks:
-- admissionReviewVersions:
-  - v1
-  - v1beta1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /mutate-baseline
-  failurePolicy: Fail
-  name: mpod.kb.io
-  rules:
-  - apiGroups:
-    - ""
-    apiVersions:
-    - v1
-    operations:
-    - CREATE
-    resources:
-    - pods
-  sideEffects: None
-
+  - name: baseline.mpod.kb.io
+    admissionReviewVersions:
+      - v1
+      - v1beta1
+    clientConfig:
+      service:
+        name: webhook-service
+        namespace: system
+        path: /mutate-baseline
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+        resources:
+          - pods
+    sideEffects: None
+    namespaceSelector:
+      matchExpressions:
+        - key: pod-security.cybozu.com/policy
+          operator: NotIn
+          values:
+            - "privileged"
+  - name: restricted.mpod.kb.io
+    admissionReviewVersions:
+      - v1
+      - v1beta1
+    clientConfig:
+      service:
+        name: webhook-service
+        namespace: system
+        path: /mutate-restricted
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+        resources:
+          - pods
+    sideEffects: None
+    namespaceSelector:
+      matchExpressions:
+        - key: pod-security.cybozu.com/policy
+          operator: In
+          values:
+            - "restricted"
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -34,23 +64,55 @@ metadata:
   creationTimestamp: null
   name: validating-webhook-configuration
 webhooks:
-- admissionReviewVersions:
-  - v1
-  - v1beta1
-  clientConfig:
-    service:
-      name: webhook-service
-      namespace: system
-      path: /validate-baseline
-  failurePolicy: Fail
-  name: vpod.kb.io
-  rules:
-  - apiGroups:
-    - ""
-    apiVersions:
-    - v1
-    operations:
-    - CREATE
-    resources:
-    - pods
-  sideEffects: None
+  - name: baseline.vpod.kb.io
+    admissionReviewVersions:
+      - v1
+      - v1beta1
+    clientConfig:
+      service:
+        name: webhook-service
+        namespace: system
+        path: /validate-baseline
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+        resources:
+          - pods
+    sideEffects: None
+    namespaceSelector:
+      matchExpressions:
+        - key: pod-security.cybozu.com/policy
+          operator: NotIn
+          values:
+            - "privileged"
+  - name: restricted.vpod.kb.io
+    admissionReviewVersions:
+      - v1
+      - v1beta1
+    clientConfig:
+      service:
+        name: webhook-service
+        namespace: system
+        path: /validate-restricted
+    failurePolicy: Fail
+    rules:
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - CREATE
+        resources:
+          - pods
+    sideEffects: None
+    namespaceSelector:
+      matchExpressions:
+        - key: pod-security.cybozu.com/policy
+          operator: In
+          values:
+            - "restricted"

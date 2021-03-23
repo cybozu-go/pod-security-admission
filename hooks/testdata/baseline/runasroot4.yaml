@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: run-as-root-4
+spec:
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu
+      securityContext:
+        runAsNonRoot: false

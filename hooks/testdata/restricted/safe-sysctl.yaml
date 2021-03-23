@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: safe-sysctl
+spec:
+  securityContext:
+    runAsNonRoot: true
+    sysctls:
+      - name: kernel.shm_rmid_forced
+        value: "0"
+      - name: net.ipv4.ping_group_range
+        value: "0 10000"
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: non-core-volume
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu
+  volumes:
+    - name: nfs
+      nfs:
+        path: /mnt/nfs
+        server: localhost

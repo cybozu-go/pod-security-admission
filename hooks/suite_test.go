@@ -1,13 +1,18 @@
 package hooks
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"fmt"
 	"net"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
+
+	v1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/util/yaml"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -96,8 +101,26 @@ var _ = BeforeSuite(func() {
 	dec, err := admission.NewDecoder(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	wh := mgr.GetWebhookServer()
-	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{"denyHostNamespace"}))
+	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{
+		"deny-host-namespace",
+		"deny-privileged-containers",
+		"deny-unsafe-capabilities",
+		"deny-host-path-volumes",
+		"deny-host-ports",
+		"deny-unsafe-apparmor",
+		"deny-unsafe-selinux",
+		"deny-unsafe-proc-mount",
+		"deny-unsafe-sysctls",
+	}))
 	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{""}))
+	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{
+		"deny-non-core-volume-types",
+		"deny-privilege-escalation",
+		"deny-run-as-root",
+		"deny-root-groups",
+		"deny-unsafe-seccomp",
+	}))
+	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{""}))
 
 	//+kubebuilder:scaffold:webhook
 
@@ -120,6 +143,19 @@ var _ = BeforeSuite(func() {
 		return nil
 	}).Should(Succeed())
 
+	// create namespaces
+	entries, err := os.ReadDir(filepath.Join("testdata", "namespace"))
+	Expect(err).NotTo(HaveOccurred())
+	for _, e := range entries {
+		y, err := os.ReadFile(filepath.Join("testdata", "namespace", e.Name()))
+		Expect(err).NotTo(HaveOccurred())
+		d := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(y), 4096)
+		ns := &v1.Namespace{}
+		err = d.Decode(ns)
+		Expect(err).NotTo(HaveOccurred())
+		err = k8sClient.Create(testCtx, ns)
+		Expect(err).NotTo(HaveOccurred())
+	}
 }, 60)
 
 var _ = AfterSuite(func() {

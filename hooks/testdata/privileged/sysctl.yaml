@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: sysctl
+spec:
+  securityContext:
+    runAsNonRoot: true
+    sysctls:
+      - name: net.core.somaxconn
+        value: "1024"
+      - name: kernel.msgmax
+        value: "65536"
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu

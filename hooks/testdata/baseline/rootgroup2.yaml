@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: root-group2
+spec:
+  securityContext:
+    runAsNonRoot: true
+    supplementalGroups:
+      - 0
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu

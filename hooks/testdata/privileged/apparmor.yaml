@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: apparmor
+  annotations:
+    "container.apparmor.security.beta.kubernetes.io/ubuntu": "localhost/my-profile"
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu
