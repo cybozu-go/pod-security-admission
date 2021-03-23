@@ -66,6 +66,7 @@ var _ = BeforeSuite(func() {
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
 			Paths: []string{filepath.Join("..", "config", "webhook")},
 		},
+		KubeAPIServerFlags: append(envtest.DefaultKubeAPIServerFlags, "--feature-gates=ProcMountType=true"),
 	}
 
 	cfg, err := testEnv.Start()
