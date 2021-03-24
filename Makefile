@@ -87,6 +87,9 @@ NILERR = $(shell pwd)/bin/nilerr
 nilerr:
 	$(call go-install-tool,$(NILERR),github.com/gostaticanalysis/nilerr/cmd/nilerr@latest)
 
+.PHONY: setup
+setup: staticcheck nilerr kustomize controller-gen
+
 .PHONY: clean
 clean:
 	rm -rf bin testbin
