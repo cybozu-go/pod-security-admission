@@ -13,7 +13,7 @@ func DenyRunAsRoot(ctx context.Context, pod *corev1.Pod) admission.Response {
 		if runAsNonRoot == nil && runAsUser == nil {
 			return admission.Denied("RunAsNonRoot must be true")
 		}
-		if runAsNonRoot != nil && *runAsNonRoot == false {
+		if runAsNonRoot != nil && !*runAsNonRoot {
 			return admission.Denied("RunAsNonRoot must be true")
 		}
 		if runAsUser != nil && *runAsUser == 0 {

@@ -17,7 +17,7 @@ func DenyPrivilegedContainers(ctx context.Context, pod *corev1.Pod) admission.Re
 		if c.SecurityContext == nil || c.SecurityContext.Privileged == nil {
 			continue
 		}
-		if *c.SecurityContext.Privileged == true {
+		if *c.SecurityContext.Privileged {
 			return admission.Denied("Privileged containers are not allowed")
 		}
 	}

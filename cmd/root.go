@@ -3,12 +3,12 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"github.com/cybozu-go/pod-security-admission/hooks"
 	"io/ioutil"
 	"net"
 	"os"
 	"strconv"
 
+	"github.com/cybozu-go/pod-security-admission/hooks"
 	"github.com/spf13/cobra"
 	"k8s.io/klog"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -16,12 +16,12 @@ import (
 )
 
 var config struct {
-	metricsAddr           string
-	probeAddr             string
-	webhookAddr           string
-	certDir               string
-	configPath            string
-	zapOpts               zap.Options
+	metricsAddr string
+	probeAddr   string
+	webhookAddr string
+	certDir     string
+	configPath  string
+	zapOpts     zap.Options
 }
 
 var rootCmd = &cobra.Command{

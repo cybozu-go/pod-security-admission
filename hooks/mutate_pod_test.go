@@ -8,7 +8,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	corev1 "k8s.io/api/core/v1"
-	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
@@ -28,7 +27,7 @@ func mutatePod(dir string, namespace string) {
 		err = k8sClient.Create(testCtx, po)
 		Expect(err).NotTo(HaveOccurred())
 
-		ret := &v1.Pod{}
+		ret := &corev1.Pod{}
 		err = k8sClient.Get(testCtx, types.NamespacedName{Name: po.GetName(), Namespace: po.GetNamespace()}, ret)
 		Expect(err).NotTo(HaveOccurred())
 	}

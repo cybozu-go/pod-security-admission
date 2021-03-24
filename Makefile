@@ -49,17 +49,16 @@ check-generate:
 	$(MAKE) generate
 	git diff --exit-code --name-only
 
-.PHONY: simple-test
-simple-test: staticcheck nilerr
+.PHONY: lint
+lint: staticcheck nilerr
 	test -z "$$(gofmt -s -l . | tee /dev/stderr)"
 	$(STATICCHECK) ./...
-	test -z "$$($(NILERR) $$(go list ./...) 2>&1 | tee /dev/stderr)"
 	go vet ./...
 
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 test: manifests generate ## Run tests.
 	mkdir -p ${ENVTEST_ASSETS_DIR}
-	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.7.0/hack/setup-envtest.sh
+	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v$(CONTROLLER_RUNTIME_VERSION)/hack/setup-envtest.sh
 	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test -v ./... -coverprofile cover.out
 
 ##@ Build

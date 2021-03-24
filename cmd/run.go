@@ -43,9 +43,9 @@ func run(addr string, port int, profs []hooks.SecurityProfile) error {
 	// admission.NewDecoder never returns non-nil error
 	dec, _ := admission.NewDecoder(scheme)
 	wh := mgr.GetWebhookServer()
-	for _, prof := range profs{
-		wh.Register("/mutate-" + prof.Name, hooks.NewPodMutator(mgr.GetClient(), dec, prof.Mutators))
-		wh.Register("/validate-" + prof.Name, hooks.NewPodValidator(mgr.GetClient(), dec, prof.Validators))
+	for _, prof := range profs {
+		wh.Register("/mutate-"+prof.Name, hooks.NewPodMutator(mgr.GetClient(), dec, prof.Mutators))
+		wh.Register("/validate-"+prof.Name, hooks.NewPodValidator(mgr.GetClient(), dec, prof.Validators))
 	}
 
 	// +kubebuilder:scaffold:builder
