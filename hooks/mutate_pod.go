@@ -6,17 +6,17 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/cybozu-go/pod-security-admission/hooks/mutators"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/utils/pointer"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 type podMutator struct {
-	client   client.Client
-	decoder  *admission.Decoder
-	mutators []string
+	client       client.Client
+	decoder      *admission.Decoder
+	mutatorNames []string
 }
 
 // NewPodMutator creates a webhook handler for Pod.
@@ -32,17 +32,12 @@ func (m *podMutator) Handle(ctx context.Context, req admission.Request) admissio
 	}
 
 	poPatched := po.DeepCopy()
-
-REINVOCATION:
-	for _, name := range m.mutators {
-		mutator, ok := mutators[name]
+	for _, name := range m.mutatorNames {
+		mutator, ok := availableMutators[name]
 		if !ok {
 			return admission.Errored(http.StatusInternalServerError, errors.New("unknown mutator: "+name))
 		}
-		updated := mutator(poPatched)
-		if updated {
-			continue REINVOCATION
-		}
+		_ = mutator(ctx, poPatched) //NOTE: if there are multiple mutator, implement reinvocation with the return value.
 	}
 	marshaled, err := json.Marshal(poPatched)
 	if err != nil {
@@ -51,35 +46,6 @@ REINVOCATION:
 	return admission.PatchResponseFromRaw(req.Object.Raw, marshaled)
 }
 
-type Mutator func(pod *corev1.Pod) bool
-
-var mutators = map[string]Mutator{
-	"force-run-as-non-root": forceRunAsNonRoot,
-}
-
-func forceRunAsNonRoot(pod *corev1.Pod) bool {
-	updated := false
-	for i, co := range pod.Spec.Containers {
-		sc := co.SecurityContext
-		if sc == nil {
-			sc = &corev1.SecurityContext{}
-		}
-		if sc.RunAsNonRoot == nil && sc.RunAsUser == nil {
-			sc.RunAsNonRoot = pointer.BoolPtr(true)
-			updated = true
-		}
-		pod.Spec.Containers[i].SecurityContext = sc
-	}
-	for i, co := range pod.Spec.InitContainers {
-		sc := co.SecurityContext
-		if sc == nil {
-			sc = &corev1.SecurityContext{}
-		}
-		if sc.RunAsNonRoot == nil && sc.RunAsUser == nil {
-			sc.RunAsNonRoot = pointer.BoolPtr(true)
-			updated = true
-		}
-		pod.Spec.InitContainers[i].SecurityContext = sc
-	}
-	return updated
+var availableMutators = map[string]mutators.Mutator{
+	"force-run-as-non-root": mutators.ForceRunAsNonRoot,
 }

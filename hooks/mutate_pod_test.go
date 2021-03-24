@@ -34,8 +34,8 @@ func mutatePod(dir string, namespace string) {
 	}
 }
 
-var _ = Describe("validate Pod webhook", func() {
-	It("should allow all pods in privileged namespace", func() {
+var _ = Describe("mutate Pod webhook", func() {
+	It("should mutate pods in mutating namespace", func() {
 		mutatePod(filepath.Join("testdata", "mutating"), "mutating")
 	})
 })

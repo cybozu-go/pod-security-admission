@@ -127,8 +127,12 @@ var _ = BeforeSuite(func() {
 	}))
 	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{}))
 
-	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{"deny-run-as-root"}))
-	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{"force-run-as-non-root"}))
+	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{
+		"deny-run-as-root",
+	}))
+	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{
+		"force-run-as-non-root",
+	}))
 
 	//+kubebuilder:scaffold:webhook
 
