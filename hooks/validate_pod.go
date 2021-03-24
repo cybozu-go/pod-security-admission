@@ -2,6 +2,7 @@ package hooks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -36,7 +37,10 @@ func (v *podValidator) Handle(ctx context.Context, req admission.Request) admiss
 	}
 
 	for _, name := range v.validators {
-		validator := validators[name]
+		validator, ok := validators[name]
+		if !ok {
+			return admission.Errored(http.StatusInternalServerError, errors.New("unknown validator: "+name))
+		}
 		res := validator(po)
 		if !res.Allowed {
 			return res

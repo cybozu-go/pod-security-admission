@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: run-as-root3
+spec:
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu

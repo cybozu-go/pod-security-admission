@@ -11,17 +11,16 @@ import (
 	"testing"
 	"time"
 
-	v1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/util/yaml"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	admissionv1 "k8s.io/api/admission/v1"
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
+	corev1 "k8s.io/api/core/v1"
 
 	//+kubebuilder:scaffold:imports
 	"k8s.io/apimachinery/pkg/runtime"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -40,6 +39,8 @@ var (
 	baselineValidatingWebhookPath   = "/validate-baseline"
 	restrictedMutatingWebhookPath   = "/mutate-restricted"
 	restrictedValidatingWebhookPath = "/validate-restricted"
+	mutatingMutatingWebhookPath     = "/mutate-mutating"
+	mutatingValidatingWebhookPath   = "/validate-mutating"
 )
 
 var k8sClient client.Client
@@ -64,7 +65,10 @@ var _ = BeforeSuite(func() {
 	testEnv = &envtest.Environment{
 		CRDDirectoryPaths: []string{filepath.Join("..", "config", "crd", "bases")},
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
-			Paths: []string{filepath.Join("..", "config", "webhook")},
+			Paths: []string{
+				filepath.Join("..", "config", "webhook"),
+				filepath.Join("testdata", "config"),
+			},
 		},
 		KubeAPIServerFlags: append(envtest.DefaultKubeAPIServerFlags, "--feature-gates=ProcMountType=true"),
 	}
@@ -113,7 +117,7 @@ var _ = BeforeSuite(func() {
 		"deny-unsafe-proc-mount",
 		"deny-unsafe-sysctls",
 	}))
-	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{""}))
+	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{}))
 	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{
 		"deny-non-core-volume-types",
 		"deny-privilege-escalation",
@@ -121,7 +125,10 @@ var _ = BeforeSuite(func() {
 		"deny-root-groups",
 		"deny-unsafe-seccomp",
 	}))
-	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{""}))
+	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{}))
+
+	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{"deny-run-as-root"}))
+	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{"force-run-as-non-root"}))
 
 	//+kubebuilder:scaffold:webhook
 
@@ -151,7 +158,7 @@ var _ = BeforeSuite(func() {
 		y, err := os.ReadFile(filepath.Join("testdata", "namespace", e.Name()))
 		Expect(err).NotTo(HaveOccurred())
 		d := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(y), 4096)
-		ns := &v1.Namespace{}
+		ns := &corev1.Namespace{}
 		err = d.Decode(ns)
 		Expect(err).NotTo(HaveOccurred())
 		err = k8sClient.Create(testCtx, ns)

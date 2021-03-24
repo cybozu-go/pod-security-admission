@@ -1,9 +1,6 @@
 package hooks
 
-// Config is a config for pod-security-admission
-type Config struct {
-}
-
+// SecurityProfile is a config for pod-security-admission
 type SecurityProfile struct {
 	Name       string   `json:"name"`
 	Validators []string `json:"validators"`

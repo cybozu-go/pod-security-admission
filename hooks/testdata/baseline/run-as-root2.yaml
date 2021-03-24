@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: run-as-root-2
+  name: run-as-root2
 spec:
   securityContext:
     runAsUser: 0
