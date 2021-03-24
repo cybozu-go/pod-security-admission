@@ -25,5 +25,5 @@ jobs:
           key: cache-${{ env.cache-version }}-go-${{ env.go-version }}-${{ hashFiles('Makefile') }}
       - run: make setup
         if: steps.cache-tools.outputs.cache-hit != 'true'
+      - run: make lint
       - run: make test
-      - run: make simple-test
