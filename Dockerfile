@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM golang:1.15 as builder
+FROM quay.io/cybozu/golang:1.16-focal as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
@@ -10,18 +10,16 @@ COPY go.sum go.sum
 RUN go mod download
 
 # Copy the go source
-COPY main.go main.go
-COPY api/ api/
-COPY controllers/ controllers/
+COPY version.go version.go
+COPY cmd/ cmd/
+COPY hooks/ hooks/
 
 # Build
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -a -o manager main.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o pod-security-admission cmd/main.go
 
-# Use distroless as minimal base image to package the manager binary
-# Refer to https://github.com/GoogleContainerTools/distroless for more details
-FROM gcr.io/distroless/static:nonroot
+FROM scratch
 WORKDIR /
-COPY --from=builder /workspace/manager .
-USER 65532:65532
+COPY --from=builder /workspace/pod-security-admission .
+USER 10000:10000
 
-ENTRYPOINT ["/manager"]
+ENTRYPOINT ["/pod-security-admission"]

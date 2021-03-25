@@ -5,7 +5,13 @@ KUSTOMIZE_VERSION = 3.8.7
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash
 .SHELLFLAGS = -e -o pipefail -c
-BIN_DIR = $(shell pwd)/bin
+BIN_DIR = ./bin
+INSTALL_YAML = build/install.yaml
+
+KUSTOMIZE = $(BIN_DIR)/kustomize
+CONTROLLER_GEN = $(BIN_DIR)/controller-gen
+STATICCHECK = $(BIN_DIR)/staticcheck
+NILERR = $(BIN_DIR)/nilerr
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -36,11 +42,11 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
-manifests: controller-gen ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+manifests: $(CONTROLLER_GEN) ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
 	$(CONTROLLER_GEN) rbac:roleName=pod-security-admission webhook paths="./..."
 
 .PHONY: generate
-generate: controller-gen ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+generate: $(CONTROLLER_GEN) ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
 	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 .PHONY: check-generate
@@ -50,7 +56,7 @@ check-generate:
 	git diff --exit-code --name-only
 
 .PHONY: lint
-lint: staticcheck nilerr
+lint: $(STATICCHECK) $(NILERR)
 	test -z "$$(gofmt -s -l . | tee /dev/stderr)"
 	$(STATICCHECK) ./...
 	go vet ./...
@@ -71,29 +77,25 @@ test: manifests generate ## Run tests.
 build: ## Build binary.
 	CGO_ENABLED=0 go build -o bin/pod-security-admission -ldflags="-w -s" main.go
 
-CONTROLLER_GEN = $(BIN_DIR)/controller-gen
-.PHONY: controller-gen
-controller-gen: ## Download controller-gen locally if necessary.
+$(INSTALL_YAML): $(KUSTOMIZE)
+	mkdir -p build
+	$(KUSTOMIZE) build ./config/default > $@
+
+$(CONTROLLER_GEN): ## Download controller-gen locally if necessary.
 	$(call go-install-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v$(CONTROLLER_TOOLS_VERSION))
 
-KUSTOMIZE = $(BIN_DIR)/kustomize
-.PHONY: kustomize
-kustomize: ## Download kustomize locally if necessary.
+$(KUSTOMIZE): ## Download kustomize locally if necessary.
 	mkdir -p $(BIN_DIR)
 	curl -sSLf https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv$(KUSTOMIZE_VERSION)/kustomize_v$(KUSTOMIZE_VERSION)_linux_amd64.tar.gz | tar -xz -C $(BIN_DIR)
 
-STATICCHECK = $(BIN_DIR)/staticcheck
-.PHONY: staticcheck
-staticcheck:
+$(STATICCHECK):
 	$(call go-install-tool,$(STATICCHECK),honnef.co/go/tools/cmd/staticcheck@latest)
 
-NILERR = $(BIN_DIR)/nilerr
-.PHONY: nilerr
-nilerr:
+$(NILERR):
 	$(call go-install-tool,$(NILERR),github.com/gostaticanalysis/nilerr/cmd/nilerr@latest)
 
 .PHONY: setup
-setup: staticcheck nilerr kustomize controller-gen
+setup: $(STATICCHECK) $(NILERR) $(KUSTOMIZE) $(CONTROLLER_GEN)
 	mkdir -p ${ENVTEST_ASSETS_DIR}
 	curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v$(CONTROLLER_RUNTIME_VERSION)/hack/setup-envtest.sh
 

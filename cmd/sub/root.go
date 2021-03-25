@@ -1,4 +1,4 @@
-package cmd
+package sub
 
 import (
 	"flag"
@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 
+	psa "github.com/cybozu-go/pod-security-admission"
 	"github.com/cybozu-go/pod-security-admission/hooks"
 	"github.com/spf13/cobra"
 	"k8s.io/klog"
@@ -24,9 +25,10 @@ var config struct {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "pod-security-admission",
-	Short: "admission webhooks to ensure pod security standards",
-	Long:  `Admission webhooks to ensure pod security standards.`,
+	Use:     "pod-security-admission",
+	Short:   "admission webhooks to ensure pod security standards",
+	Long:    `Admission webhooks to ensure pod security standards.`,
+	Version: psa.Version(),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cmd.SilenceUsage = true
 		h, p, err := net.SplitHostPort(config.webhookAddr)

@@ -1,5 +1,5 @@
 domain: cybozu.com
 layout: go.kubebuilder.io/v3
-projectName: tmp
+projectName: pod-security-admission
 repo: github.com/cybozu-go/pod-security-admission
 version: "3"

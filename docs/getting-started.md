@@ -32,7 +32,7 @@ $ kubectl label namespace/cert-manager pod-security.cybozu.com/policy=privileged
 Deploy pod-security-admission:
 
 ```console
-$ kustomize build ./config/default | kubectl apply -f -
+$ kubectl apply -f https://github.com/cybozu-go/pod-security-admission/releases/download/v0.0.1-alpha.0/install.yaml
 ```
 
 Verification

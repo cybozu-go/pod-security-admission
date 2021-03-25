@@ -1,4 +1,4 @@
-package cmd
+package sub
 
 import (
 	"github.com/cybozu-go/pod-security-admission/hooks"
