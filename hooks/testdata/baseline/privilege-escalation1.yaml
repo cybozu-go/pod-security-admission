@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: privilege-escalation
+  name: privilege-escalation1
   annotations:
     test.pod-security.cybozu.com/message: "denied the request: spec.containers[0].securityContext.allowPrivilegeEscalation: Forbidden: Allowing privilege escalation for containers is not allowed"
 spec:

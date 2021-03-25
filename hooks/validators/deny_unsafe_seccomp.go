@@ -23,7 +23,7 @@ func DenyUnsafeSeccomp(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 			continue
 		}
 		if co.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
-			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", pod.Spec.SecurityContext.SeccompProfile.Type)))
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", co.SecurityContext.SeccompProfile.Type)))
 		}
 	}
 
@@ -33,7 +33,7 @@ func DenyUnsafeSeccomp(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 			continue
 		}
 		if co.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
-			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", pod.Spec.SecurityContext.SeccompProfile.Type)))
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", co.SecurityContext.SeccompProfile.Type)))
 		}
 	}
 

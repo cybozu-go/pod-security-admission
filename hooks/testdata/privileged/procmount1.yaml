@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: procmount
+  name: procmount1
   annotations:
     test.pod-security.cybozu.com/message: "denied the request: spec.containers[0].securityContext.procMount: Forbidden: ProcMountType Unmasked is not allowed"
 spec:

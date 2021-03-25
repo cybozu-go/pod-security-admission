@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: seccomp
+  name: seccomp1
   annotations:
     test.pod-security.cybozu.com/message: "denied the request: spec.securityContext.seccompProfile.type: Forbidden: Localhost is not an allowed seccomp profile"
 spec:

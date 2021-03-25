@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: capability1
+  annotations:
+    test.pod-security.cybozu.com/message: "denied the request: spec.initContainers[0].securityContext.capabilities.add[0]: Forbidden: Adding capability SYS_ROOT is not allowed"
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu
+  initContainers:
+    - name: debug
+      image: quay.io/cybozu/ubuntu-debug
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+          add:
+            - SYS_ROOT

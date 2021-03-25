@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: capability
+  name: capability2
   annotations:
     test.pod-security.cybozu.com/message: "denied the request: spec.containers[0].securityContext.capabilities.add[0]: Forbidden: Adding capability NET_ADMIN is not allowed"
 spec:
