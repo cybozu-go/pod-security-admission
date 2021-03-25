@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: noncore-volume
+  annotations:
+    test.pod-security.cybozu.com/message: "denied the request: spec.volumes[0]: Forbidden: Volume type NFS is not allowed to be used"
 spec:
   securityContext:
     runAsNonRoot: true

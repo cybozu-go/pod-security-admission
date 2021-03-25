@@ -18,7 +18,7 @@ func DenyPrivilegedContainers(ctx context.Context, pod *corev1.Pod) field.ErrorL
 			continue
 		}
 		if *co.SecurityContext.Privileged {
-			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext"), "Privileged containers are not allowed"))
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "privileged"), "Privileged containers are not allowed"))
 		}
 	}
 
@@ -28,7 +28,7 @@ func DenyPrivilegedContainers(ctx context.Context, pod *corev1.Pod) field.ErrorL
 			continue
 		}
 		if *co.SecurityContext.Privileged {
-			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext"), "Privileged containers are not allowed"))
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "privileged"), "Privileged containers are not allowed"))
 		}
 	}
 	return errs

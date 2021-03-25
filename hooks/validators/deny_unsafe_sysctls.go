@@ -25,7 +25,7 @@ func DenyUnsafeSysctls(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	}
 	for i, sysctl := range pod.Spec.SecurityContext.Sysctls {
 		if !containsString(allowedSysctls, sysctl.Name) {
-			errs = append(errs, field.Forbidden(p.Index(i).Child("securityContext", "sysctls"), fmt.Sprintf("Setting sysctl %s is not allowed", sysctl.Name)))
+			errs = append(errs, field.Forbidden(p.Child("securityContext", "sysctls").Index(i), fmt.Sprintf("Setting sysctl %s is not allowed", sysctl.Name)))
 		}
 	}
 	return errs

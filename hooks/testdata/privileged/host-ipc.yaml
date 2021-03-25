@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: host-ipc
+  annotations:
+    test.pod-security.cybozu.com/message: "denied the request: spec.hostIPC: Forbidden: Host ips is not allowed to be used"
 spec:
   securityContext:
     runAsNonRoot: true

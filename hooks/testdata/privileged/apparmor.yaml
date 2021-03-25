@@ -3,7 +3,8 @@ kind: Pod
 metadata:
   name: apparmor
   annotations:
-    "container.apparmor.security.beta.kubernetes.io/ubuntu": "localhost/my-profile"
+    container.apparmor.security.beta.kubernetes.io/ubuntu: "localhost/my-profile"
+    test.pod-security.cybozu.com/message: "denied the request: spec.annotations[container.apparmor.security.beta.kubernetes.io/ubuntu]: Forbidden: localhost/my-profile is not an allowed AppArmor profile"
 spec:
   securityContext:
     runAsNonRoot: true

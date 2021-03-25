@@ -2,6 +2,8 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: sysctl
+  annotations:
+    test.pod-security.cybozu.com/message: "denied the request: [spec.securityContext.sysctls[0]: Forbidden: Setting sysctl net.core.somaxconn is not allowed, spec.securityContext.sysctls[1]: Forbidden: Setting sysctl kernel.msgmax is not allowed]"
 spec:
   securityContext:
     runAsNonRoot: true

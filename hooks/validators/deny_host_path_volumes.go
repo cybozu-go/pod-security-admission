@@ -16,7 +16,7 @@ func DenyHostPathVolumes(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 			continue
 		}
 		if len(vol.HostPath.Path) != 0 || vol.HostPath.Type != nil {
-			errs = append(errs, field.Forbidden(p.Index(i), "Host path is not allowed to be used"))
+			errs = append(errs, field.Forbidden(p.Index(i), "Volume type HostPath is not allowed to be used"))
 		}
 	}
 	return errs

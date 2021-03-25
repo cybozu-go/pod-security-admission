@@ -39,7 +39,7 @@ func DenyUnsafeCapabilities(ctx context.Context, pod *corev1.Pod) field.ErrorLis
 		}
 		for j, add := range co.SecurityContext.Capabilities.Add {
 			if !containsString(defaultCapabilities, string(add)) {
-				errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "capabilities").Index(j), fmt.Sprintf("Adding capability %s is not allowed", add)))
+				errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "capabilities", "add").Index(j), fmt.Sprintf("Adding capability %s is not allowed", add)))
 			}
 		}
 	}
@@ -51,7 +51,7 @@ func DenyUnsafeCapabilities(ctx context.Context, pod *corev1.Pod) field.ErrorLis
 		}
 		for j, add := range co.SecurityContext.Capabilities.Add {
 			if !containsString(defaultCapabilities, string(add)) {
-				errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "capabilities").Index(j), fmt.Sprintf("Adding capability %s is not allowed", add)))
+				errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "capabilities", "add").Index(j), fmt.Sprintf("Adding capability %s is not allowed", add)))
 			}
 		}
 	}

@@ -17,7 +17,7 @@ func DenyHostPorts(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 		ppp := pp.Index(i)
 		for j, port := range co.Ports {
 			if port.HostPort != 0 {
-				errs = append(errs, field.Forbidden(ppp.Index(j), "Host port is not allowed to be used"))
+				errs = append(errs, field.Forbidden(ppp.Child("ports").Index(j), "Host port is not allowed to be used"))
 			}
 		}
 	}
@@ -27,7 +27,7 @@ func DenyHostPorts(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 		ppp := pp.Index(i)
 		for j, port := range co.Ports {
 			if port.HostPort != 0 {
-				errs = append(errs, field.Forbidden(ppp.Index(j), "Host port is not allowed to be used"))
+				errs = append(errs, field.Forbidden(ppp.Child("ports").Index(j), "Host port is not allowed to be used"))
 			}
 		}
 	}

@@ -3,7 +3,6 @@ package hooks
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -32,7 +31,8 @@ func validatePod(dir string, namespace string, allowed bool) {
 			Expect(err).To(HaveOccurred(), "pod: %v", po)
 			statusErr := &k8serrors.StatusError{}
 			Expect(errors.As(err, &statusErr)).To(BeTrue())
-			fmt.Printf("%s/%s: %s\n", po.Namespace, po.Name, statusErr.ErrStatus.Message)
+			expected := po.Annotations["test.pod-security.cybozu.com/message"]
+			Expect(statusErr.ErrStatus.Message).To(ContainSubstring(expected))
 		}
 	}
 }
