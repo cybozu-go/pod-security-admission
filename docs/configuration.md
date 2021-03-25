@@ -4,9 +4,41 @@ Configuration
 Customize Policy
 ----------------
 
-You can customize the rules for each policy.
+`pod-security-admission` enforces policies that conform to [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) by default.
+You can customize it.
 
-By default, the following configuration is used:
+### Validators
+
+`pod-security-admission` provides the following validators:
+
+| name                       | policy type | description                                               |
+| -------------------------- | ----------- | --------------------------------------------------------- |
+| deny-host-namespace        | baseline    | deny sharing the host namespaces                          |
+| deny-privileged-containers | baseline    | deny privileged containers                                |
+| deny-unsafe-capabilities   | baseline    | deny adding capabilities beyond the default set           |
+| deny-host-path-volumes     | baseline    | deny usage of HostPath volumes                            |
+| deny-host-ports            | baseline    | deny usage of HostPorts                                   |
+| deny-unsafe-apparmor       | baseline    | deny overriding or disabling the default AppArmor profile |
+| deny-unsafe-selinux        | baseline    | deny setting custom SELinux options                       |
+| deny-unsafe-proc-mount     | baseline    | deny unmasked proc mount                                  |
+| deny-unsafe-sysctls        | baseline    | deny usage of unsafe sysctls                              |
+| deny-non-core-volume-types | restricted  | deny usage of non-core volume types                       |
+| deny-privilege-escalation  | restricted  | deny privilege escalation                                 |
+| deny-run-as-root           | restricted  | deny running as root users                                |
+| deny-root-groups           | restricted  | deny running with a root primary or supplementary GID     |
+| deny unsafe-seccomp        | restricted  | deny usage of non-default Seccomp profile                 |
+
+### Mutators
+
+`pod-security-admission` provides the following mutators (Not enabled by default):
+
+| name                  | policy type | description                       |
+| --------------------- | ----------- | --------------------------------- |
+| force-run-as-non-root | -           | force running with non-root users |
+
+### Customize
+
+By default, `pod-security-admission` uses the following configuration:
 
 ```yaml
 - name: baseline
@@ -28,8 +60,7 @@ By default, the following configuration is used:
     - deny-run-as-root
     - deny-root-groups
     - deny-unsafe-seccomp
-  mutators:
-    - force-run-as-non-root
+  mutators: []
 ```
 
 For example, if you want to enforce `deny-run-as-root` and `force-run-as-non-root` in `Baseline`,
@@ -58,3 +89,13 @@ administrators can add the rules under the `Baseline` section:
     - deny-unsafe-seccomp
   mutators: []
 ```
+
+### Webhook Configuration
+
+You can configure [ValidatingWebhookConfiguration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#validatingwebhookconfiguration-v1-admissionregistration-k8s-io) and [MutatingWebhookConfiguration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#mutatingwebhookconfiguration-v1-admissionregistration-k8s-io) to change which Pods are covered by each policy.
+
+See [manifests.yaml](../config/webhook/manifests.yaml) in details.
+
+The endpoint of the webhook is determined by the name of the policy, such as `baseline` and `restricted`. 
+A validating webhook will be `/validate-` + the policy name, a mutating webhook will be `/mutate-` + the policy name.
+For example, the endpoint of the validating webhook for `baseline` will be `/validate-baseline`, mutating webhook will be `/mutate-baseline`.
