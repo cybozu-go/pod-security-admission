@@ -5,26 +5,37 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // DenyUnsafeSeccomp is a Validator that denies usage of non-default Seccomp profile
-func DenyUnsafeSeccomp(ctx context.Context, pod *corev1.Pod) admission.Response {
+func DenyUnsafeSeccomp(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
+
 	if pod.Spec.SecurityContext != nil && pod.Spec.SecurityContext.SeccompProfile != nil && pod.Spec.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
-		return admission.Denied(fmt.Sprintf("%s is not an allowed seccomp prifile", pod.Spec.SecurityContext.SeccompProfile.Type))
+		errs = append(errs, field.Forbidden(p.Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", pod.Spec.SecurityContext.SeccompProfile.Type)))
 	}
 
-	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
-	copy(containers, pod.Spec.Containers)
-	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
-
-	for _, container := range containers {
-		if container.SecurityContext == nil || container.SecurityContext.SeccompProfile == nil {
+	pp := p.Child("containers")
+	for i, co := range pod.Spec.Containers {
+		if co.SecurityContext == nil || co.SecurityContext.SeccompProfile == nil {
 			continue
 		}
-		if container.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
-			return admission.Denied(fmt.Sprintf("%s is not an allowed seccomp prifile", container.SecurityContext.SeccompProfile.Type))
+		if co.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", pod.Spec.SecurityContext.SeccompProfile.Type)))
 		}
 	}
-	return admission.Allowed("ok")
+
+	pp = p.Child("initContainers")
+	for i, co := range pod.Spec.InitContainers {
+		if co.SecurityContext == nil || co.SecurityContext.SeccompProfile == nil {
+			continue
+		}
+		if co.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", pod.Spec.SecurityContext.SeccompProfile.Type)))
+		}
+	}
+
+	return errs
 }

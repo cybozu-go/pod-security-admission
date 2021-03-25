@@ -4,21 +4,32 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // DenyHostPorts is a Validator that denies usage of HostPorts
-func DenyHostPorts(ctx context.Context, pod *corev1.Pod) admission.Response {
-	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
-	copy(containers, pod.Spec.Containers)
-	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
+func DenyHostPorts(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
 
-	for _, container := range containers {
-		for _, port := range container.Ports {
+	pp := p.Child("containers")
+	for i, co := range pod.Spec.Containers {
+		ppp := pp.Index(i)
+		for j, port := range co.Ports {
 			if port.HostPort != 0 {
-				return admission.Denied("Host port is not allowed to be used")
+				errs = append(errs, field.Forbidden(ppp.Index(j), "Host port is not allowed to be used"))
 			}
 		}
 	}
-	return admission.Allowed("ok")
+
+	pp = p.Child("initContainers")
+	for i, co := range pod.Spec.InitContainers {
+		ppp := pp.Index(i)
+		for j, port := range co.Ports {
+			if port.HostPort != 0 {
+				errs = append(errs, field.Forbidden(ppp.Index(j), "Host port is not allowed to be used"))
+			}
+		}
+	}
+	return errs
 }

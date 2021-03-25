@@ -4,19 +4,21 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // DenyHostNamespace is a Validator that denies sharing the host namespaces
-func DenyHostNamespace(ctx context.Context, pod *corev1.Pod) admission.Response {
+func DenyHostNamespace(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
 	if pod.Spec.HostNetwork {
-		return admission.Denied("Host network is not allowed to be used")
+		errs = append(errs, field.Forbidden(p.Child("hostNetwork"), "Host network is not allowed to be used"))
 	}
 	if pod.Spec.HostPID {
-		return admission.Denied("Host pid is not allowed to be used")
+		errs = append(errs, field.Forbidden(p.Child("hostPID"), "Host pid is not allowed to be used"))
 	}
 	if pod.Spec.HostIPC {
-		return admission.Denied("Host ipc is not allowed to be used")
+		errs = append(errs, field.Forbidden(p.Child("hostIPC"), "Host ips is not allowed to be used"))
 	}
-	return admission.Allowed("ok")
+	return errs
 }

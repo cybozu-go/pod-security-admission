@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // default list of capabilities for Docker
@@ -28,21 +28,33 @@ var defaultCapabilities = []string{
 }
 
 // DenyUnsafeCapabilities is a Validator that denies adding capabilities beyond the default set
-func DenyUnsafeCapabilities(ctx context.Context, pod *corev1.Pod) admission.Response {
-	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
-	copy(containers, pod.Spec.Containers)
-	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
+func DenyUnsafeCapabilities(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
 
-	for _, c := range containers {
-		if c.SecurityContext == nil || c.SecurityContext.Capabilities == nil {
+	pp := p.Child("containers")
+	for i, co := range pod.Spec.Containers {
+		if co.SecurityContext == nil || co.SecurityContext.Capabilities == nil {
 			continue
 		}
-		for _, add := range c.SecurityContext.Capabilities.Add {
+		for j, add := range co.SecurityContext.Capabilities.Add {
 			if !containsString(defaultCapabilities, string(add)) {
-				return admission.Denied(fmt.Sprintf("Adding capability %s is not allowed", add))
+				errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "capabilities").Index(j), fmt.Sprintf("Adding capability %s is not allowed", add)))
 			}
 		}
 	}
 
-	return admission.Allowed("ok")
+	pp = p.Child("initContainers")
+	for i, co := range pod.Spec.InitContainers {
+		if co.SecurityContext == nil || co.SecurityContext.Capabilities == nil {
+			continue
+		}
+		for j, add := range co.SecurityContext.Capabilities.Add {
+			if !containsString(defaultCapabilities, string(add)) {
+				errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "capabilities").Index(j), fmt.Sprintf("Adding capability %s is not allowed", add)))
+			}
+		}
+	}
+
+	return errs
 }

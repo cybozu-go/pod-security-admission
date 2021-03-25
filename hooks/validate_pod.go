@@ -5,6 +5,8 @@ import (
 	"errors"
 	"net/http"
 
+	"k8s.io/apimachinery/pkg/util/validation/field"
+
 	"github.com/cybozu-go/pod-security-admission/hooks/validators"
 	corev1 "k8s.io/api/core/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -35,15 +37,18 @@ func (v *podValidator) Handle(ctx context.Context, req admission.Request) admiss
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
+	var allErrs field.ErrorList
 	for _, name := range v.validatorNames {
 		validator, ok := availableValidators[name]
 		if !ok {
 			return admission.Errored(http.StatusInternalServerError, errors.New("unknown validator: "+name))
 		}
-		res := validator(ctx, po)
-		if !res.Allowed {
-			return res
-		}
+		errs := validator(ctx, po)
+		allErrs = append(allErrs, errs...)
+	}
+
+	if len(allErrs) > 0 {
+		return admission.Denied(allErrs.ToAggregate().Error())
 	}
 
 	return admission.Allowed("ok")

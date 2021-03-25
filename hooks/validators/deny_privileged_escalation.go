@@ -4,23 +4,34 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // DenyPrivilegeEscalation is a Validator that denies privilege escalation
-func DenyPrivilegeEscalation(ctx context.Context, pod *corev1.Pod) admission.Response {
-	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
-	copy(containers, pod.Spec.Containers)
-	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
+func DenyPrivilegeEscalation(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
 
-	for _, container := range containers {
-		if container.SecurityContext == nil || container.SecurityContext.AllowPrivilegeEscalation == nil {
+	pp := p.Child("containers")
+	for i, co := range pod.Spec.Containers {
+		if co.SecurityContext == nil || co.SecurityContext.AllowPrivilegeEscalation == nil {
 			continue
 		}
-		escalation := *container.SecurityContext.AllowPrivilegeEscalation
+		escalation := *co.SecurityContext.AllowPrivilegeEscalation
 		if escalation {
-			return admission.Denied("Allowing privilege escalation for containers is not allowed")
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "allowPrivilegeEscalation"), "Allowing privilege escalation for containers is not allowed"))
 		}
 	}
-	return admission.Allowed("ok")
+
+	pp = p.Child("initContainers")
+	for i, co := range pod.Spec.InitContainers {
+		if co.SecurityContext == nil || co.SecurityContext.AllowPrivilegeEscalation == nil {
+			continue
+		}
+		escalation := *co.SecurityContext.AllowPrivilegeEscalation
+		if escalation {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "allowPrivilegeEscalation"), "Allowing privilege escalation for containers is not allowed"))
+		}
+	}
+	return errs
 }

@@ -4,36 +4,47 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // DenyRootGroups is a Validator that denies running with a root primary or supplementary GID
-func DenyRootGroups(ctx context.Context, pod *corev1.Pod) admission.Response {
+func DenyRootGroups(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
+
 	if pod.Spec.SecurityContext != nil {
+		pp := p.Child("securityContext")
 		if pod.Spec.SecurityContext.RunAsGroup != nil && *pod.Spec.SecurityContext.RunAsGroup == 0 {
-			return admission.Denied("Running with the root GID is forbidden")
+			errs = append(errs, field.Forbidden(pp.Child("runAsGroup"), "Running with the root GID is forbidden"))
 		}
-		for _, group := range pod.Spec.SecurityContext.SupplementalGroups {
+		for i, group := range pod.Spec.SecurityContext.SupplementalGroups {
 			if group == 0 {
-				return admission.Denied("Running with the supplementary GID is forbidden")
+				errs = append(errs, field.Forbidden(pp.Child("supplementalGroups").Index(i), "Running with the supplementary GID is forbidden"))
 			}
 		}
 		if pod.Spec.SecurityContext.FSGroup != nil && *pod.Spec.SecurityContext.FSGroup == 0 {
-			return admission.Denied("Running with the root GID is forbidden")
+			errs = append(errs, field.Forbidden(pp.Child("fsGroup"), "Running with the root GID is forbidden"))
 		}
 	}
 
-	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
-	copy(containers, pod.Spec.Containers)
-	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
-
-	for _, container := range containers {
-		if container.SecurityContext == nil {
+	pp := p.Child("containers")
+	for i, co := range pod.Spec.Containers {
+		if co.SecurityContext == nil {
 			continue
 		}
-		if container.SecurityContext.RunAsGroup != nil && *container.SecurityContext.RunAsGroup == 0 {
-			return admission.Denied("Running with the root GID is forbidden")
+		if co.SecurityContext.RunAsGroup != nil && *co.SecurityContext.RunAsGroup == 0 {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "runAsGroup"), "Running with the root GID is forbidden"))
 		}
 	}
-	return admission.Allowed("ok")
+
+	pp = p.Child("initContainers")
+	for i, co := range pod.Spec.InitContainers {
+		if co.SecurityContext == nil {
+			continue
+		}
+		if co.SecurityContext.RunAsGroup != nil && *co.SecurityContext.RunAsGroup == 0 {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "runAsGroup"), "Running with the root GID is forbidden"))
+		}
+	}
+	return errs
 }

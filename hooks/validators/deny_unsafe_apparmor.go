@@ -6,16 +6,19 @@ import (
 	"strings"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // DenyUnsafeAppArmor is a Validator that denies overriding or disabling the default AppArmor profile
-func DenyUnsafeAppArmor(ctx context.Context, pod *corev1.Pod) admission.Response {
+func DenyUnsafeAppArmor(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec").Child("annotations")
+	var errs field.ErrorList
+
 	for k, v := range pod.Annotations {
 		if strings.HasPrefix(k, corev1.AppArmorBetaContainerAnnotationKeyPrefix) &&
 			v != corev1.AppArmorBetaProfileRuntimeDefault {
-			return admission.Denied(fmt.Sprintf("%s is not an allowed AppArmor profile", v))
+			errs = append(errs, field.Forbidden(p.Key(k), fmt.Sprintf("%s is not an allowed AppArmor profile", v)))
 		}
 	}
-	return admission.Allowed("ok")
+	return errs
 }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 var allowedSysctls = []string{
@@ -16,14 +16,17 @@ var allowedSysctls = []string{
 }
 
 // DenyUnsafeSysctls is a Validator that denies usage of unsafe sysctls
-func DenyUnsafeSysctls(ctx context.Context, pod *corev1.Pod) admission.Response {
+func DenyUnsafeSysctls(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
+
 	if pod.Spec.SecurityContext == nil {
-		return admission.Allowed("ok")
+		return errs
 	}
-	for _, sysctl := range pod.Spec.SecurityContext.Sysctls {
+	for i, sysctl := range pod.Spec.SecurityContext.Sysctls {
 		if !containsString(allowedSysctls, sysctl.Name) {
-			return admission.Denied(fmt.Sprintf("Setting sysctl %s is not allowed", sysctl.Name))
+			errs = append(errs, field.Forbidden(p.Index(i).Child("securityContext", "sysctls"), fmt.Sprintf("Setting sysctl %s is not allowed", sysctl.Name)))
 		}
 	}
-	return admission.Allowed("ok")
+	return errs
 }

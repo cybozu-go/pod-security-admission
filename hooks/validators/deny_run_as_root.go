@@ -4,44 +4,61 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// DenyRunAsRoot is a Validator that denies running as root users
-func DenyRunAsRoot(ctx context.Context, pod *corev1.Pod) admission.Response {
-	validate := func(runAsNonRoot *bool, runAsUser *int64) admission.Response {
-		if runAsNonRoot == nil && runAsUser == nil {
-			return admission.Denied("RunAsNonRoot must be true")
-		}
-		if runAsNonRoot != nil && !*runAsNonRoot {
-			return admission.Denied("RunAsNonRoot must be true")
-		}
-		if runAsUser != nil && *runAsUser == 0 {
-			return admission.Denied("Running with the root UID is forbidden")
-		}
-		return admission.Allowed("ok")
+func validateRunUser(p *field.Path, runAsNonRoot *bool, runAsUser *int64) *field.Error {
+	if runAsNonRoot == nil && runAsUser == nil {
+		return field.Forbidden(p, "RunAsNonRoot must be true")
 	}
+	if runAsNonRoot != nil && !*runAsNonRoot {
+		return field.Forbidden(p.Child("runAsNonRoot"), "RunAsNonRoot must be true")
+	}
+	if runAsUser != nil && *runAsUser == 0 {
+		return field.Forbidden(p.Child("runAsUser"), "Running with the root UID is forbidden")
+	}
+	return nil
+}
 
-	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
-	copy(containers, pod.Spec.Containers)
-	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
+// DenyRunAsRoot is a Validator that denies running as root users
+func DenyRunAsRoot(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
 
 	allContainersAllowed := true
-	for _, container := range containers {
-		if container.SecurityContext == nil || (container.SecurityContext.RunAsNonRoot == nil && container.SecurityContext.RunAsUser == nil) {
+	pp := p.Child("containers")
+	for i, co := range pod.Spec.Containers {
+		if co.SecurityContext == nil || (co.SecurityContext.RunAsNonRoot == nil && co.SecurityContext.RunAsUser == nil) {
 			allContainersAllowed = false
 			continue
 		}
-		if res := validate(container.SecurityContext.RunAsNonRoot, container.SecurityContext.RunAsUser); !res.Allowed {
-			return res
+		if err := validateRunUser(pp.Index(i).Child("securityContext"), co.SecurityContext.RunAsNonRoot, co.SecurityContext.RunAsUser); err != nil {
+			allContainersAllowed = false
+			errs = append(errs, err)
+		}
+	}
+
+	pp = p.Child("initContainers")
+	for i, co := range pod.Spec.InitContainers {
+		if co.SecurityContext == nil || (co.SecurityContext.RunAsNonRoot == nil && co.SecurityContext.RunAsUser == nil) {
+			allContainersAllowed = false
+			continue
+		}
+		if err := validateRunUser(pp.Index(i).Child("securityContext"), co.SecurityContext.RunAsNonRoot, co.SecurityContext.RunAsUser); err != nil {
+			allContainersAllowed = false
+			errs = append(errs, err)
 		}
 	}
 	if allContainersAllowed {
-		return admission.Allowed("ok")
+		return errs
 	}
 
 	if pod.Spec.SecurityContext == nil {
-		return admission.Denied("RunAsNonRoot must be true")
+		errs = append(errs, field.Forbidden(p.Child("securityContext"), "RunAsNonRoot must be true"))
+		return errs
 	}
-	return validate(pod.Spec.SecurityContext.RunAsNonRoot, pod.Spec.SecurityContext.RunAsUser)
+	if err := validateRunUser(p.Child("securityContext"), pod.Spec.SecurityContext.RunAsNonRoot, pod.Spec.SecurityContext.RunAsUser); err != nil {
+		errs = append(errs, err)
+	}
+	return errs
 }

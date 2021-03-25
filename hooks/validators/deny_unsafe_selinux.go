@@ -4,23 +4,31 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // DenyUnsafeSELinux is a Validator that denies setting custom SELinux options
-func DenyUnsafeSELinux(ctx context.Context, pod *corev1.Pod) admission.Response {
+func DenyUnsafeSELinux(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
+
 	if pod.Spec.SecurityContext != nil && pod.Spec.SecurityContext.SELinuxOptions != nil {
-		return admission.Denied("Setting custom SELinux options is not allowed")
+		errs = append(errs, field.Forbidden(p.Child("securityContext", "selinuxOptions"), "Setting custom SELinux options is not allowed"))
 	}
 
-	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
-	copy(containers, pod.Spec.Containers)
-	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
-
-	for _, container := range containers {
-		if container.SecurityContext != nil && container.SecurityContext.SELinuxOptions != nil {
-			return admission.Denied("Setting custom SELinux options is not allowed")
+	pp := p.Child("containers")
+	for i, co := range pod.Spec.Containers {
+		if co.SecurityContext != nil && co.SecurityContext.SELinuxOptions != nil {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "selinuxOptions"), "Setting custom SELinux options is not allowed"))
 		}
 	}
-	return admission.Allowed("ok")
+
+	pp = p.Child("initContainers")
+	for i, co := range pod.Spec.InitContainers {
+		if co.SecurityContext != nil && co.SecurityContext.SELinuxOptions != nil {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "selinuxOptions"), "Setting custom SELinux options is not allowed"))
+		}
+	}
+
+	return errs
 }

@@ -5,23 +5,35 @@ import (
 	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // DenyUnsafeProcMount is a Validator that denies unmasked proc mount
-func DenyUnsafeProcMount(ctx context.Context, pod *corev1.Pod) admission.Response {
-	containers := make([]corev1.Container, len(pod.Spec.Containers)+len(pod.Spec.InitContainers))
-	copy(containers, pod.Spec.Containers)
-	copy(containers[len(pod.Spec.Containers):], pod.Spec.InitContainers)
+func DenyUnsafeProcMount(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec")
+	var errs field.ErrorList
 
-	for _, container := range containers {
-		if container.SecurityContext == nil || container.SecurityContext.ProcMount == nil {
+	pp := p.Child("containers")
+	for i, co := range pod.Spec.Containers {
+		if co.SecurityContext == nil || co.SecurityContext.ProcMount == nil {
 			continue
 		}
-		proc := *container.SecurityContext.ProcMount
+		proc := *co.SecurityContext.ProcMount
 		if proc != corev1.DefaultProcMount {
-			return admission.Denied(fmt.Sprintf("ProcMountType %s is not allowed", proc))
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "procMount"), fmt.Sprintf("ProcMountType %s is not allowed", proc)))
 		}
 	}
-	return admission.Allowed("ok")
+
+	pp = p.Child("initContainers")
+	for i, co := range pod.Spec.InitContainers {
+		if co.SecurityContext == nil || co.SecurityContext.ProcMount == nil {
+			continue
+		}
+		proc := *co.SecurityContext.ProcMount
+		if proc != corev1.DefaultProcMount {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "procMount"), fmt.Sprintf("ProcMountType %s is not allowed", proc)))
+		}
+	}
+
+	return errs
 }

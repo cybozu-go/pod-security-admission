@@ -4,18 +4,20 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
 // DenyHostPathVolumes is a Validator that denies usage of HostPath volumes
-func DenyHostPathVolumes(ctx context.Context, pod *corev1.Pod) admission.Response {
-	for _, vol := range pod.Spec.Volumes {
+func DenyHostPathVolumes(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	p := field.NewPath("spec").Child("volumes")
+	var errs field.ErrorList
+	for i, vol := range pod.Spec.Volumes {
 		if vol.HostPath == nil {
 			continue
 		}
 		if len(vol.HostPath.Path) != 0 || vol.HostPath.Type != nil {
-			return admission.Denied("Host path is not allowed to be used")
+			errs = append(errs, field.Forbidden(p.Index(i), "Host path is not allowed to be used"))
 		}
 	}
-	return admission.Allowed("ok")
+	return errs
 }
