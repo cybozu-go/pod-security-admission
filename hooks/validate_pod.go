@@ -42,13 +42,13 @@ func createValidators(prof SecurityProfile) []validators.Validator {
 	if prof.DenyPrivilegedContainers {
 		list = append(list, validators.DenyPrivilegedContainers{})
 	}
-	if prof.Capabilities.DenyUnsafeCapabilities {
+	if prof.Capabilities.DenyUnsafeCapabilities || len(prof.Capabilities.AllowedCapabilities) > 0 {
 		list = append(list, validators.NewDenyUnsafeCapabilities(prof.Capabilities.AllowedCapabilities))
 	}
 	if prof.Volumes.DenyHostPathVolumes {
 		list = append(list, validators.DenyHostPathVolumes{})
 	}
-	if prof.HostPorts.DenyHostPorts {
+	if prof.HostPorts.DenyHostPorts || len(prof.HostPorts.AllowedHostPorts) > 0 {
 		list = append(list, validators.NewDenyHostPorts(prof.HostPorts.AllowedHostPorts))
 	}
 	if prof.DenyUnsafeAppArmor {
@@ -69,7 +69,7 @@ func createValidators(prof SecurityProfile) []validators.Validator {
 	if prof.DenyPrivilegeEscalation {
 		list = append(list, validators.DenyPrivilegeEscalation{})
 	}
-	if prof.RunAsRoot.DenyRunAsRoot {
+	if prof.Users.DenyRunAsRoot || prof.Users.ForceRunAsNonRoot {
 		list = append(list, validators.DenyRunAsRoot{})
 	}
 	if prof.DenyRootGroups {

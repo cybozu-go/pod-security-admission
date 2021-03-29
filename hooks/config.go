@@ -16,7 +16,7 @@ type SecurityProfile struct {
 	DenyUnsafeProcMount      bool              `json:"denyUnsafeProcMount"`
 	DenyUnsafeSysctls        bool              `json:"denyUnsafeSysctls"`
 	DenyPrivilegeEscalation  bool              `json:"denyPrivilegeEscalation"`
-	RunAsRoot                RunAsRootProfile  `json:"runAsRoot"`
+	Users                    UserProfile       `json:"users"`
 	DenyRootGroups           bool              `json:"denyRootGroups"`
 	DenyUnsafeSeccomp        bool              `json:"denyUnsafeSeccomp"`
 }
@@ -36,7 +36,7 @@ type CapabilityProfile struct {
 	AllowedCapabilities    []string `json:"allowedCapabilities"`
 }
 
-type RunAsRootProfile struct {
+type UserProfile struct {
 	DenyRunAsRoot     bool `json:"denyRunAsRoot"`
 	ForceRunAsNonRoot bool `json:"forceRunAsNonRoot"`
 }

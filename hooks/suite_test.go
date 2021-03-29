@@ -136,7 +136,7 @@ var _ = BeforeSuite(func() {
 		Name:                    "restricted",
 		Volumes:                 VolumeProfile{DenyNonCoreVolumeTypes: true},
 		DenyPrivilegeEscalation: true,
-		RunAsRoot:               RunAsRootProfile{DenyRunAsRoot: true},
+		Users:                   UserProfile{DenyRunAsRoot: true},
 		DenyRootGroups:          true,
 		DenyUnsafeSeccomp:       true,
 	}
@@ -145,7 +145,7 @@ var _ = BeforeSuite(func() {
 
 	mutatingProfile := SecurityProfile{
 		Name: "mutating",
-		RunAsRoot: RunAsRootProfile{
+		Users: UserProfile{
 			DenyRunAsRoot:     true,
 			ForceRunAsNonRoot: true,
 		},
