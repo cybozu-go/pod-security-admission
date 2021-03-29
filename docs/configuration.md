@@ -1,44 +1,70 @@
 Configuration
 =============
 
-Customize Policy
+`pod-security-admission` can specify a profile for each webhook endpoint.
+
+SecurityProfile 
 ----------------
 
-`pod-security-admission` enforces policies that conform to [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) by default.
-You can customize it.
+SecurityProfile has these fields:
 
-### Validators
+| Name                     | Type              | Description                                               |
+| ------------------------ | ----------------- | --------------------------------------------------------- |
+| name                     | string            | The name of the profile                                   |
+| denyHostNamespace        | bool              | Deny sharing the host namespaces                          |
+| denyPrivilegedContainers | bool              | Deny privileged containers                                |
+| capabilities             | CapabilityProfile | The profile for capabilities                              |
+| volumes                  | VolumeProfile     | The profile for volumes                                   |
+| hostPorts                | HostPortProfile   | The profile for hostPorts                                 |
+| denyUnsafeApparmor       | bool              | Deny overriding or disabling the default AppArmor profile |
+| denyUnsafeSelinux        | bool              | Deny setting custom SELinux options                       |
+| denyUnsafeProcMount      | bool              | Deny unmasked proc mount                                  |
+| denyUnsafeSysctls        | bool              | Deny usage of unsafe sysctls                              |
+| denyPrivilegeEscalation  | bool              | Deny privilege escalation                                 |
+| users                    | UserProfile       | The profile for users                                     |
+| denyRootGroups           | bool              | Deny running with a root primary or supplementary GID     |
+| denyUnsafeSeccomp        | bool              | Deny usage of non-default Seccomp profile                 |
 
-`pod-security-admission` provides the following validators:
+### CapabilityProfile
 
-| name                       | policy type | description                                               |
-| -------------------------- | ----------- | --------------------------------------------------------- |
-| deny-host-namespace        | baseline    | deny sharing the host namespaces                          |
-| deny-privileged-containers | baseline    | deny privileged containers                                |
-| deny-unsafe-capabilities   | baseline    | deny adding capabilities beyond the default set           |
-| deny-host-path-volumes     | baseline    | deny usage of HostPath volumes                            |
-| deny-host-ports            | baseline    | deny usage of HostPorts                                   |
-| deny-unsafe-apparmor       | baseline    | deny overriding or disabling the default AppArmor profile |
-| deny-unsafe-selinux        | baseline    | deny setting custom SELinux options                       |
-| deny-unsafe-proc-mount     | baseline    | deny unmasked proc mount                                  |
-| deny-unsafe-sysctls        | baseline    | deny usage of unsafe sysctls                              |
-| deny-non-core-volume-types | restricted  | deny usage of non-core volume types                       |
-| deny-privilege-escalation  | restricted  | deny privilege escalation                                 |
-| deny-run-as-root           | restricted  | deny running as root users                                |
-| deny-root-groups           | restricted  | deny running with a root primary or supplementary GID     |
-| deny unsafe-seccomp        | restricted  | deny usage of non-default Seccomp profile                 |
+| Name                   | Type     | Description                                                                                                                                                         |
+| ---------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| denyUnsafeCapabilities | bool     | Deny adding capabilities beyond the [default set](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities) and `allowedCapabilities` |
+| allowedCapabilities    | []string | The list of capabilities that cab be added                                                                                                                          |
 
-### Mutators
+### VolumeProfile
 
-`pod-security-admission` provides the following mutators (Not enabled by default):
+| Name                   | Type | Description                         |
+| ---------------------- | ---- | ----------------------------------- |
+| denyHostPathVolumes    | bool | Deny usage of HostPath volumes      |
+| denyNonCoreVolumeTypes | bool | Deny usage of non-core volume types |
 
-| name                  | policy type | description                       |
-| --------------------- | ----------- | --------------------------------- |
-| force-run-as-non-root | -           | force running with non-root users |
+### HostPortProfile
 
-### Customize
+| Name             | Type        | Description                                           |
+| ---------------- | ----------- | ----------------------------------------------------- |
+| denyHostPorts    | bool        | Deny usage of HostPorts except for `allowedHostPorts` |
+| allowedHostPorts | []PortRange | The list of host ports that can be used               |
 
-By default, `pod-security-admission` uses the following configuration:
+### PortRange
+
+| Name | Type  | Description                            |
+| ---- | ----- | -------------------------------------- |
+| min  | int32 | The min of host port range (inclusive) |
+| max  | int32 | The max of host port range (inclusive) |
+
+### UserProfile
+
+| Name              | Type | Description                                          |
+| ----------------- | ---- | ---------------------------------------------------- |
+| denyRunAsRoot     | bool | Deny running as root users                           |
+| forceRunAsNonRoot | bool | Force running with non-root users by MutatingWebhook |
+
+
+Customize Profile
+-----------------
+
+By default, `pod-security-admission` uses the following configuration to enforce [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/):
 
 ```yaml
 - name: baseline
@@ -58,14 +84,15 @@ By default, `pod-security-admission` uses the following configuration:
   volumes:
     denyNonCoreVolumeTypes: true
   denyPrivilegeEscalation: true
-  runAsRoot:
+  users:
     denyRunAsRoot: true
   denyRootGroups: true
   denyUnsafeSeccomp: true
 ```
 
-For example, if you want to enforce `deny-run-as-root` and `force-run-as-non-root` in `Baseline`,
-administrators can add the rules under the `Baseline` section: 
+For example, administrators can customize the profile under the `Baseline` section as follows.
+This profile allows to add `SYSLOG` and `NET_ADMIN` capability, use of hostPort from 1024 to 65535.
+It also forces run as non-root user.
 
 ```yaml
 - name: baseline
@@ -87,7 +114,7 @@ administrators can add the rules under the `Baseline` section:
   denyUnsafeSelinux: true
   denyUnsafeProcMount: true
   denyUnsafeSysctls: true
-  runAsRoot:
+  users:
     denyRunAsRoot: true
     forceRunAsNonRoot: true
 - name: restricted
