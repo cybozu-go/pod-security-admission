@@ -9,7 +9,9 @@ import (
 )
 
 // DenyUnsafeProcMount is a Validator that denies unmasked proc mount
-func DenyUnsafeProcMount(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyUnsafeProcMount struct{}
+
+func (v DenyUnsafeProcMount) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

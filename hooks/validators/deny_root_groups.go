@@ -8,7 +8,9 @@ import (
 )
 
 // DenyRootGroups is a Validator that denies running with a root primary or supplementary GID
-func DenyRootGroups(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyRootGroups struct{}
+
+func (v DenyRootGroups) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

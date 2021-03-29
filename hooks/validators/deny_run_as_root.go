@@ -21,7 +21,9 @@ func validateRunUser(p *field.Path, runAsNonRoot *bool, runAsUser *int64) *field
 }
 
 // DenyRunAsRoot is a Validator that denies running as root users
-func DenyRunAsRoot(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyRunAsRoot struct{}
+
+func (v DenyRunAsRoot) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

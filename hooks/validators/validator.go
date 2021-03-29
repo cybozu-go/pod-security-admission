@@ -7,5 +7,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-// Validator is a function signature for validators
-type Validator func(ctx context.Context, pod *corev1.Pod) field.ErrorList
+// Validator is an interface for validator
+type Validator interface {
+	Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList
+}

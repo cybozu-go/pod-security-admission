@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-ports
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu
+      ports:
+        - containerPort: 8080
+          hostPort: 65500
+        - containerPort: 9090
+          hostPort: 65502

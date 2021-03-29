@@ -8,7 +8,9 @@ import (
 )
 
 // DenyHostNamespace is a Validator that denies sharing the host namespaces
-func DenyHostNamespace(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyHostNamespace struct{}
+
+func (v DenyHostNamespace) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 	if pod.Spec.HostNetwork {

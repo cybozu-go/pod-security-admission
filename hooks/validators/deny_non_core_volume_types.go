@@ -8,7 +8,9 @@ import (
 )
 
 // DenyNonCoreVolumeTypes is a Validator that denies usage of non-core volume types
-func DenyNonCoreVolumeTypes(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyNonCoreVolumeTypes struct{}
+
+func (v DenyNonCoreVolumeTypes) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec").Child("volumes")
 	var errs field.ErrorList
 

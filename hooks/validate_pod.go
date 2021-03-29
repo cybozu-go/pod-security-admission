@@ -2,7 +2,6 @@ package hooks
 
 import (
 	"context"
-	"errors"
 	"net/http"
 
 	"github.com/cybozu-go/pod-security-admission/hooks/validators"
@@ -16,21 +15,70 @@ import (
 )
 
 type podValidator struct {
-	client         client.Client
-	log            logr.Logger
-	decoder        *admission.Decoder
-	validatorNames []string
+	client      client.Client
+	log         logr.Logger
+	decoder     *admission.Decoder
+	profileName string
+	validators  []validators.Validator
 }
 
 // NewPodValidator creates a webhook handler for Pod.
-func NewPodValidator(c client.Client, log logr.Logger, dec *admission.Decoder, validators []string) http.Handler {
+func NewPodValidator(c client.Client, log logr.Logger, dec *admission.Decoder, prof SecurityProfile) http.Handler {
 	v := &podValidator{
-		client:         c,
-		log:            log,
-		decoder:        dec,
-		validatorNames: validators,
+		client:      c,
+		log:         log,
+		decoder:     dec,
+		profileName: prof.Name,
+		validators:  createValidators(prof),
 	}
 	return &webhook.Admission{Handler: v}
+}
+
+func createValidators(prof SecurityProfile) []validators.Validator {
+	list := make([]validators.Validator, 0)
+	if prof.DenyHostNamespace {
+		list = append(list, validators.DenyHostNamespace{})
+	}
+	if prof.DenyPrivilegedContainers {
+		list = append(list, validators.DenyPrivilegedContainers{})
+	}
+	if prof.DenyUnsafeCapabilities {
+		list = append(list, validators.NewDenyUnsafeCapabilities(prof.AllowedCapabilities))
+	}
+	if prof.DenyHostPathVolumes {
+		list = append(list, validators.DenyHostPathVolumes{})
+	}
+	if prof.DenyHostPorts {
+		list = append(list, validators.NewDenyHostPorts(prof.AllowedHostPorts))
+	}
+	if prof.DenyUnsafeAppArmor {
+		list = append(list, validators.DenyUnsafeAppArmor{})
+	}
+	if prof.DenyUnsafeSELinux {
+		list = append(list, validators.DenyUnsafeSELinux{})
+	}
+	if prof.DenyUnsafeProcMount {
+		list = append(list, validators.DenyUnsafeProcMount{})
+	}
+	if prof.DenyUnsafeSysctls {
+		list = append(list, validators.DenyUnsafeSysctls{})
+	}
+	if prof.DenyNonCoreVolumeTypes {
+		list = append(list, validators.DenyNonCoreVolumeTypes{})
+	}
+	if prof.DenyPrivilegeEscalation {
+		list = append(list, validators.DenyPrivilegeEscalation{})
+	}
+	if prof.DenyRunAsRoot {
+		list = append(list, validators.DenyRunAsRoot{})
+	}
+	if prof.DenyRootGroups {
+		list = append(list, validators.DenyRootGroups{})
+	}
+	if prof.DenyUnsafeSeccomp {
+		list = append(list, validators.DenyUnsafeSeccomp{})
+	}
+	return list
 }
 
 func (v *podValidator) Handle(ctx context.Context, req admission.Request) admission.Response {
@@ -38,47 +86,26 @@ func (v *podValidator) Handle(ctx context.Context, req admission.Request) admiss
 		Name:      req.Name,
 		Namespace: req.Namespace,
 	}
-	v.log.Info("validating pod,", "name", namespacedName)
+	v.log.Info("validating pod", "name", namespacedName, "profile", v.profileName)
 
 	po := &corev1.Pod{}
 	err := v.decoder.Decode(req, po)
 	if err != nil {
-		v.log.Error(err, "failed to decode pod", "name", namespacedName)
+		v.log.Error(err, "failed to decode pod", "name", namespacedName, "profile", v.profileName)
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
 	var allErrs field.ErrorList
-	for _, name := range v.validatorNames {
-		validator, ok := availableValidators[name]
-		if !ok {
-			return admission.Errored(http.StatusInternalServerError, errors.New("unknown validator: "+name))
-		}
-		errs := validator(ctx, po)
+	for _, validator := range v.validators {
+		errs := validator.Validate(ctx, po)
 		allErrs = append(allErrs, errs...)
 	}
 
 	if len(allErrs) > 0 {
 		reason := allErrs.ToAggregate().Error()
-		v.log.Info("denied the pod", "name", namespacedName, "reason", reason)
+		v.log.Info("denied the pod", "name", namespacedName, "profile", v.profileName, "reason", reason)
 		return admission.Denied(reason)
 	}
 
 	return admission.Allowed("ok")
-}
-
-var availableValidators = map[string]validators.Validator{
-	"deny-host-namespace":        validators.DenyHostNamespace,
-	"deny-privileged-containers": validators.DenyPrivilegedContainers,
-	"deny-unsafe-capabilities":   validators.DenyUnsafeCapabilities,
-	"deny-host-path-volumes":     validators.DenyHostPathVolumes,
-	"deny-host-ports":            validators.DenyHostPorts,
-	"deny-unsafe-apparmor":       validators.DenyUnsafeAppArmor,
-	"deny-unsafe-selinux":        validators.DenyUnsafeSELinux,
-	"deny-unsafe-proc-mount":     validators.DenyUnsafeProcMount,
-	"deny-unsafe-sysctls":        validators.DenyUnsafeSysctls,
-	"deny-non-core-volume-types": validators.DenyNonCoreVolumeTypes,
-	"deny-privilege-escalation":  validators.DenyPrivilegeEscalation,
-	"deny-run-as-root":           validators.DenyRunAsRoot,
-	"deny-root-groups":           validators.DenyRootGroups,
-	"deny-unsafe-seccomp":        validators.DenyUnsafeSeccomp,
 }

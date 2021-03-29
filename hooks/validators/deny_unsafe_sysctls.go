@@ -16,7 +16,9 @@ var allowedSysctls = map[string]struct{}{
 }
 
 // DenyUnsafeSysctls is a Validator that denies usage of unsafe sysctls
-func DenyUnsafeSysctls(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyUnsafeSysctls struct{}
+
+func (v DenyUnsafeSysctls) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

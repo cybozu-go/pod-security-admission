@@ -8,7 +8,9 @@ import (
 )
 
 // DenyHostPathVolumes is a Validator that denies usage of HostPath volumes
-func DenyHostPathVolumes(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyHostPathVolumes struct{}
+
+func (v DenyHostPathVolumes) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec").Child("volumes")
 	var errs field.ErrorList
 	for i, vol := range pod.Spec.Volumes {

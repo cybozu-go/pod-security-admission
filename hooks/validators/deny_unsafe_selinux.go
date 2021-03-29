@@ -8,7 +8,9 @@ import (
 )
 
 // DenyUnsafeSELinux is a Validator that denies setting custom SELinux options
-func DenyUnsafeSELinux(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyUnsafeSELinux struct{}
+
+func (v DenyUnsafeSELinux) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

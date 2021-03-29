@@ -10,7 +10,9 @@ import (
 )
 
 // DenyUnsafeAppArmor is a Validator that denies overriding or disabling the default AppArmor profile
-func DenyUnsafeAppArmor(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyUnsafeAppArmor struct{}
+
+func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec").Child("annotations")
 	var errs field.ErrorList
 

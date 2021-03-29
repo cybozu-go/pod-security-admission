@@ -8,7 +8,9 @@ import (
 )
 
 // DenyPrivilegedContainers is a Validator that denies privileged containers
-func DenyPrivilegedContainers(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyPrivilegedContainers struct{}
+
+func (v DenyPrivilegedContainers) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

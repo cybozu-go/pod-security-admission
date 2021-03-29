@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: additional-capability
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu
+      securityContext:
+        capabilities:
+          add:
+            - NET_BIND_SERVICE
+            - SYSLOG

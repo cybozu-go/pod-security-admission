@@ -8,7 +8,9 @@ import (
 )
 
 // DenyPrivilegeEscalation is a Validator that denies privilege escalation
-func DenyPrivilegeEscalation(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyPrivilegeEscalation struct{}
+
+func (v DenyPrivilegeEscalation) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

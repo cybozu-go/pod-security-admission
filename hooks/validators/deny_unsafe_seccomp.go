@@ -9,7 +9,9 @@ import (
 )
 
 // DenyUnsafeSeccomp is a Validator that denies usage of non-default Seccomp profile
-func DenyUnsafeSeccomp(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+type DenyUnsafeSeccomp struct{}
+
+func (v DenyUnsafeSeccomp) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

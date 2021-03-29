@@ -7,7 +7,9 @@ import (
 	"k8s.io/utils/pointer"
 )
 
-func ForceRunAsNonRoot(ctx context.Context, pod *corev1.Pod) bool {
+type ForceRunAsNonRoot struct{}
+
+func (m ForceRunAsNonRoot) Mutate(ctx context.Context, pod *corev1.Pod) bool {
 	updated := false
 	for i, co := range pod.Spec.Containers {
 		sc := co.SecurityContext
