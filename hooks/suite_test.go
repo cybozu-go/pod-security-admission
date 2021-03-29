@@ -11,16 +11,13 @@ import (
 	"testing"
 	"time"
 
+	//+kubebuilder:scaffold:imports
 	"github.com/cybozu-go/pod-security-admission/hooks/validators"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
 	admissionv1 "k8s.io/api/admission/v1"
 	admissionv1beta1 "k8s.io/api/admission/v1beta1"
 	corev1 "k8s.io/api/core/v1"
-
-	//+kubebuilder:scaffold:imports
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
@@ -108,50 +105,53 @@ var _ = BeforeSuite(func() {
 	dec, err := admission.NewDecoder(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	wh := mgr.GetWebhookServer()
-	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(baselineValidatingWebhookPath), dec, SecurityProfile{
+	baselineProfile := SecurityProfile{
 		Name:                     "baseline",
 		DenyHostNamespace:        true,
 		DenyPrivilegedContainers: true,
-		DenyUnsafeCapabilities:   true,
-		AllowedCapabilities: []string{
-			"SYSLOG",
+		Capabilities: CapabilityProfile{
+			DenyUnsafeCapabilities: true,
+			AllowedCapabilities: []string{
+				"SYSLOG",
+			},
 		},
-		DenyHostPathVolumes: true,
-		DenyHostPorts:       true,
-		AllowedHostPorts: []validators.PortRange{
-			{
-				Min: 65500,
-				Max: 65502,
+		Volumes: VolumeProfile{DenyHostPathVolumes: true},
+		HostPorts: HostPortProfile{
+			DenyHostPorts: true,
+			AllowedHostPorts: []validators.PortRange{
+				{
+					Min: 65500,
+					Max: 65502,
+				},
 			},
 		},
 		DenyUnsafeAppArmor:  true,
 		DenyUnsafeSELinux:   true,
 		DenyUnsafeProcMount: true,
 		DenyUnsafeSysctls:   true,
-	}))
-	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(baselineMutatingWebhookPath), dec, SecurityProfile{
-		Name: "baseline",
-	}))
-	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(restrictedValidatingWebhookPath), dec, SecurityProfile{
+	}
+	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(baselineValidatingWebhookPath), dec, baselineProfile))
+	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(baselineMutatingWebhookPath), dec, baselineProfile))
+	restrictedProfile := SecurityProfile{
 		Name:                    "restricted",
-		DenyNonCoreVolumeTypes:  true,
+		Volumes:                 VolumeProfile{DenyNonCoreVolumeTypes: true},
 		DenyPrivilegeEscalation: true,
-		DenyRunAsRoot:           true,
+		RunAsRoot:               RunAsRootProfile{DenyRunAsRoot: true},
 		DenyRootGroups:          true,
 		DenyUnsafeSeccomp:       true,
-	}))
-	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(restrictedMutatingWebhookPath), dec, SecurityProfile{
-		Name: "restricted",
-	}))
+	}
+	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(restrictedValidatingWebhookPath), dec, restrictedProfile))
+	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(restrictedMutatingWebhookPath), dec, restrictedProfile))
 
-	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(mutatingValidatingWebhookPath), dec, SecurityProfile{
-		Name:          "mutating",
-		DenyRunAsRoot: true,
-	}))
-	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(mutatingMutatingWebhookPath), dec, SecurityProfile{
-		Name:              "mutating",
-		ForceRunAsNonRoot: true,
-	}))
+	mutatingProfile := SecurityProfile{
+		Name: "mutating",
+		RunAsRoot: RunAsRootProfile{
+			DenyRunAsRoot:     true,
+			ForceRunAsNonRoot: true,
+		},
+	}
+	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(mutatingValidatingWebhookPath), dec, mutatingProfile))
+	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(mutatingMutatingWebhookPath), dec, mutatingProfile))
 
 	//+kubebuilder:scaffold:webhook
 

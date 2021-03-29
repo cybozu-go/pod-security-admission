@@ -42,14 +42,14 @@ func createValidators(prof SecurityProfile) []validators.Validator {
 	if prof.DenyPrivilegedContainers {
 		list = append(list, validators.DenyPrivilegedContainers{})
 	}
-	if prof.DenyUnsafeCapabilities {
-		list = append(list, validators.NewDenyUnsafeCapabilities(prof.AllowedCapabilities))
+	if prof.Capabilities.DenyUnsafeCapabilities {
+		list = append(list, validators.NewDenyUnsafeCapabilities(prof.Capabilities.AllowedCapabilities))
 	}
-	if prof.DenyHostPathVolumes {
+	if prof.Volumes.DenyHostPathVolumes {
 		list = append(list, validators.DenyHostPathVolumes{})
 	}
-	if prof.DenyHostPorts {
-		list = append(list, validators.NewDenyHostPorts(prof.AllowedHostPorts))
+	if prof.HostPorts.DenyHostPorts {
+		list = append(list, validators.NewDenyHostPorts(prof.HostPorts.AllowedHostPorts))
 	}
 	if prof.DenyUnsafeAppArmor {
 		list = append(list, validators.DenyUnsafeAppArmor{})
@@ -63,13 +63,13 @@ func createValidators(prof SecurityProfile) []validators.Validator {
 	if prof.DenyUnsafeSysctls {
 		list = append(list, validators.DenyUnsafeSysctls{})
 	}
-	if prof.DenyNonCoreVolumeTypes {
+	if prof.Volumes.DenyNonCoreVolumeTypes {
 		list = append(list, validators.DenyNonCoreVolumeTypes{})
 	}
 	if prof.DenyPrivilegeEscalation {
 		list = append(list, validators.DenyPrivilegeEscalation{})
 	}
-	if prof.DenyRunAsRoot {
+	if prof.RunAsRoot.DenyRunAsRoot {
 		list = append(list, validators.DenyRunAsRoot{})
 	}
 	if prof.DenyRootGroups {
