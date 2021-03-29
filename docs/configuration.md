@@ -42,25 +42,26 @@ By default, `pod-security-admission` uses the following configuration:
 
 ```yaml
 - name: baseline
-  validators:
-    - deny-host-namespace
-    - deny-privileged-containers
-    - deny-unsafe-capabilities
-    - deny-host-path-volumes
-    - deny-host-ports
-    - deny-unsafe-apparmor
-    - deny-unsafe-selinux
-    - deny-unsafe-proc-mount
-    - deny-unsafe-sysctls
-  mutators: []
+  denyHostNamespace: true
+  denyPrivilegedContainers: true
+  capabilities:
+    denyUnsafeCapabilities: true
+  volumes:
+    denyHostPathVolumes: true
+  hostPorts:
+    denyHostPorts: true
+  denyUnsafeApparmor: true
+  denyUnsafeSelinux: true
+  denyUnsafeProcMount: true
+  denyUnsafeSysctls: true
 - name: restricted
-  validators:
-    - deny-non-core-volume-types
-    - deny-privilege-escalation
-    - deny-run-as-root
-    - deny-root-groups
-    - deny-unsafe-seccomp
-  mutators: []
+  volumes:
+    denyNonCoreVolumeTypes: true
+  denyPrivilegeEscalation: true
+  runAsRoot:
+    denyRunAsRoot: true
+  denyRootGroups: true
+  denyUnsafeSeccomp: true
 ```
 
 For example, if you want to enforce `deny-run-as-root` and `force-run-as-non-root` in `Baseline`,
@@ -68,26 +69,33 @@ administrators can add the rules under the `Baseline` section:
 
 ```yaml
 - name: baseline
-  validators:
-    - deny-host-namespace
-    - deny-privileged-containers
-    - deny-unsafe-capabilities
-    - deny-host-path-volumes
-    - deny-host-ports
-    - deny-unsafe-apparmor
-    - deny-unsafe-selinux
-    - deny-unsafe-proc-mount
-    - deny-unsafe-sysctls
-    - deny-run-as-root
-  mutators:
-    - force-run-as-non-root
+  denyHostNamespace: true
+  denyPrivilegedContainers: true
+  capabilities:
+    denyUnsafeCapabilities: true
+    allowedCapabilities:
+      - SYSLOG
+      - NET_ADMIN
+  volumes:
+    denyHostPathVolumes: true
+  hostPorts:
+    denyHostPorts: true
+    allowedHostPorts:
+      - min: 1024
+        max: 65535
+  denyUnsafeApparmor: true
+  denyUnsafeSelinux: true
+  denyUnsafeProcMount: true
+  denyUnsafeSysctls: true
+  runAsRoot:
+    denyRunAsRoot: true
+    forceRunAsNonRoot: true
 - name: restricted
-  validators:
-    - deny-non-core-volume-types
-    - deny-privilege-escalation
-    - deny-root-groups
-    - deny-unsafe-seccomp
-  mutators: []
+  volumes:
+    denyNonCoreVolumeTypes: true
+  denyPrivilegeEscalation: true
+  denyRootGroups: true
+  denyUnsafeSeccomp: true
 ```
 
 ### Webhook Configuration
