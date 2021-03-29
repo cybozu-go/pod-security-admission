@@ -5,10 +5,11 @@ import (
 	"errors"
 	"net/http"
 
-	"k8s.io/apimachinery/pkg/util/validation/field"
-
 	"github.com/cybozu-go/pod-security-admission/hooks/validators"
+	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/validation/field"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
@@ -16,14 +17,16 @@ import (
 
 type podValidator struct {
 	client         client.Client
+	log            logr.Logger
 	decoder        *admission.Decoder
 	validatorNames []string
 }
 
 // NewPodValidator creates a webhook handler for Pod.
-func NewPodValidator(c client.Client, dec *admission.Decoder, validators []string) http.Handler {
+func NewPodValidator(c client.Client, log logr.Logger, dec *admission.Decoder, validators []string) http.Handler {
 	v := &podValidator{
 		client:         c,
+		log:            log,
 		decoder:        dec,
 		validatorNames: validators,
 	}
@@ -31,9 +34,16 @@ func NewPodValidator(c client.Client, dec *admission.Decoder, validators []strin
 }
 
 func (v *podValidator) Handle(ctx context.Context, req admission.Request) admission.Response {
+	namespacedName := types.NamespacedName{
+		Name:      req.Name,
+		Namespace: req.Namespace,
+	}
+	v.log.Info("validating pod,", "name", namespacedName)
+
 	po := &corev1.Pod{}
 	err := v.decoder.Decode(req, po)
 	if err != nil {
+		v.log.Error(err, "failed to decode pod", "name", namespacedName)
 		return admission.Errored(http.StatusBadRequest, err)
 	}
 
@@ -48,7 +58,9 @@ func (v *podValidator) Handle(ctx context.Context, req admission.Request) admiss
 	}
 
 	if len(allErrs) > 0 {
-		return admission.Denied(allErrs.ToAggregate().Error())
+		reason := allErrs.ToAggregate().Error()
+		v.log.Info("denied the pod", "name", namespacedName, "reason", reason)
+		return admission.Denied(reason)
 	}
 
 	return admission.Allowed("ok")

@@ -56,10 +56,14 @@ lint: staticcheck nilerr
 	go vet ./...
 
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+.PHONY: test
 test: manifests generate ## Run tests.
-	mkdir -p ${ENVTEST_ASSETS_DIR}
-	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v$(CONTROLLER_RUNTIME_VERSION)/hack/setup-envtest.sh
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test -v ./... -coverprofile cover.out
+	{ \
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh && \
+	fetch_envtest_tools $(ENVTEST_ASSETS_DIR) && \
+	setup_envtest_env $(ENVTEST_ASSETS_DIR) && \
+	go test -v -count=1 ./... -coverprofile cover.out ; \
+	}
 
 ##@ Build
 
@@ -90,6 +94,8 @@ nilerr:
 
 .PHONY: setup
 setup: staticcheck nilerr kustomize controller-gen
+	mkdir -p ${ENVTEST_ASSETS_DIR}
+	curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v$(CONTROLLER_RUNTIME_VERSION)/hack/setup-envtest.sh
 
 .PHONY: clean
 clean:

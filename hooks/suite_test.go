@@ -106,7 +106,7 @@ var _ = BeforeSuite(func() {
 	dec, err := admission.NewDecoder(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	wh := mgr.GetWebhookServer()
-	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{
+	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(baselineValidatingWebhookPath), dec, []string{
 		"deny-host-namespace",
 		"deny-privileged-containers",
 		"deny-unsafe-capabilities",
@@ -117,20 +117,20 @@ var _ = BeforeSuite(func() {
 		"deny-unsafe-proc-mount",
 		"deny-unsafe-sysctls",
 	}))
-	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{}))
-	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{
+	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(baselineMutatingWebhookPath), dec, []string{}))
+	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(restrictedValidatingWebhookPath), dec, []string{
 		"deny-non-core-volume-types",
 		"deny-privilege-escalation",
 		"deny-run-as-root",
 		"deny-root-groups",
 		"deny-unsafe-seccomp",
 	}))
-	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{}))
+	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(restrictedMutatingWebhookPath), dec, []string{}))
 
-	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), dec, []string{
+	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(mutatingValidatingWebhookPath), dec, []string{
 		"deny-run-as-root",
 	}))
-	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), dec, []string{
+	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(mutatingMutatingWebhookPath), dec, []string{
 		"force-run-as-non-root",
 	}))
 

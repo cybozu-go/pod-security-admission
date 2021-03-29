@@ -10,21 +10,21 @@ import (
 
 // default list of capabilities for Docker
 // ref: https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities
-var defaultCapabilities = []string{
-	"AUDIT_WRITE",
-	"CHOWN",
-	"DAC_OVERRIDE",
-	"FOWNER",
-	"FSETID",
-	"KILL",
-	"MKNOD",
-	"NET_BIND_SERVICE",
-	"NET_RAW",
-	"SETFCAP",
-	"SETGID",
-	"SETPCAP",
-	"SETUID",
-	"SYS_CHROOT",
+var defaultCapabilities = map[string]struct{}{
+	"AUDIT_WRITE":      {},
+	"CHOWN":            {},
+	"DAC_OVERRIDE":     {},
+	"FOWNER":           {},
+	"FSETID":           {},
+	"KILL":             {},
+	"MKNOD":            {},
+	"NET_BIND_SERVICE": {},
+	"NET_RAW":          {},
+	"SETFCAP":          {},
+	"SETGID":           {},
+	"SETPCAP":          {},
+	"SETUID":           {},
+	"SYS_CHROOT":       {},
 }
 
 // DenyUnsafeCapabilities is a Validator that denies adding capabilities beyond the default set
@@ -38,7 +38,7 @@ func DenyUnsafeCapabilities(ctx context.Context, pod *corev1.Pod) field.ErrorLis
 			continue
 		}
 		for j, add := range co.SecurityContext.Capabilities.Add {
-			if !containsString(defaultCapabilities, string(add)) {
+			if _, ok := defaultCapabilities[string(add)]; !ok {
 				errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "capabilities", "add").Index(j), fmt.Sprintf("Adding capability %s is not allowed", add)))
 			}
 		}
@@ -50,7 +50,7 @@ func DenyUnsafeCapabilities(ctx context.Context, pod *corev1.Pod) field.ErrorLis
 			continue
 		}
 		for j, add := range co.SecurityContext.Capabilities.Add {
-			if !containsString(defaultCapabilities, string(add)) {
+			if _, ok := defaultCapabilities[string(add)]; !ok {
 				errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "capabilities", "add").Index(j), fmt.Sprintf("Adding capability %s is not allowed", add)))
 			}
 		}

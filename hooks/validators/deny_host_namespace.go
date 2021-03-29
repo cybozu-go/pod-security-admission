@@ -18,7 +18,7 @@ func DenyHostNamespace(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 		errs = append(errs, field.Forbidden(p.Child("hostPID"), "Host pid is not allowed to be used"))
 	}
 	if pod.Spec.HostIPC {
-		errs = append(errs, field.Forbidden(p.Child("hostIPC"), "Host ips is not allowed to be used"))
+		errs = append(errs, field.Forbidden(p.Child("hostIPC"), "Host ipc is not allowed to be used"))
 	}
 	return errs
 }

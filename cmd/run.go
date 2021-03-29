@@ -44,8 +44,8 @@ func run(addr string, port int, profs []hooks.SecurityProfile) error {
 	dec, _ := admission.NewDecoder(scheme)
 	wh := mgr.GetWebhookServer()
 	for _, prof := range profs {
-		wh.Register("/mutate-"+prof.Name, hooks.NewPodMutator(mgr.GetClient(), dec, prof.Mutators))
-		wh.Register("/validate-"+prof.Name, hooks.NewPodValidator(mgr.GetClient(), dec, prof.Validators))
+		wh.Register("/mutate-"+prof.Name, hooks.NewPodMutator(mgr.GetClient(), ctrl.Log.WithName("mutate-"+prof.Name), dec, prof.Mutators))
+		wh.Register("/validate-"+prof.Name, hooks.NewPodValidator(mgr.GetClient(), ctrl.Log.WithName("validate-"+prof.Name), dec, prof.Validators))
 	}
 
 	// +kubebuilder:scaffold:builder
