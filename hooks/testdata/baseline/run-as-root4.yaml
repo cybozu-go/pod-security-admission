@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: run-as-root4
+  annotations:
+    test.pod-security.cybozu.com/message: "denied the request: [spec.containers[0].securityContext.runAsNonRoot: Forbidden: RunAsNonRoot must be true, spec.securityContext: Forbidden: RunAsNonRoot must be true]"
+spec:
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu
+      securityContext:
+        runAsNonRoot: false

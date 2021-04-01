@@ -5,6 +5,7 @@ KUSTOMIZE_VERSION = 3.8.7
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash
 .SHELLFLAGS = -e -o pipefail -c
+BIN_DIR = $(shell pwd)/bin
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -48,18 +49,21 @@ check-generate:
 	$(MAKE) generate
 	git diff --exit-code --name-only
 
-.PHONY: simple-test
-simple-test: staticcheck nilerr
+.PHONY: lint
+lint: staticcheck nilerr
 	test -z "$$(gofmt -s -l . | tee /dev/stderr)"
 	$(STATICCHECK) ./...
-	test -z "$$($(NILERR) $$(go list ./...) 2>&1 | tee /dev/stderr)"
 	go vet ./...
 
 ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
+.PHONY: test
 test: manifests generate ## Run tests.
-	mkdir -p ${ENVTEST_ASSETS_DIR}
-	test -f ${ENVTEST_ASSETS_DIR}/setup-envtest.sh || curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v0.7.0/hack/setup-envtest.sh
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh; fetch_envtest_tools $(ENVTEST_ASSETS_DIR); setup_envtest_env $(ENVTEST_ASSETS_DIR); go test ./... -coverprofile cover.out
+	{ \
+	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh && \
+	fetch_envtest_tools $(ENVTEST_ASSETS_DIR) && \
+	setup_envtest_env $(ENVTEST_ASSETS_DIR) && \
+	go test -v -count=1 ./... -coverprofile cover.out ; \
+	}
 
 ##@ Build
 
@@ -67,25 +71,31 @@ test: manifests generate ## Run tests.
 build: ## Build binary.
 	CGO_ENABLED=0 go build -o bin/pod-security-admission -ldflags="-w -s" main.go
 
-CONTROLLER_GEN = $(shell pwd)/bin/controller-gen
+CONTROLLER_GEN = $(BIN_DIR)/controller-gen
 .PHONY: controller-gen
 controller-gen: ## Download controller-gen locally if necessary.
 	$(call go-install-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v$(CONTROLLER_TOOLS_VERSION))
 
-KUSTOMIZE = $(shell pwd)/bin/kustomize
+KUSTOMIZE = $(BIN_DIR)/kustomize
 .PHONY: kustomize
 kustomize: ## Download kustomize locally if necessary.
-	$(call go-install-tool,$(KUSTOMIZE),sigs.k8s.io/kustomize/kustomize/v3@v$(KUSTOMIZE_VERSION))
+	mkdir -p $(BIN_DIR)
+	curl -sSLf https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv$(KUSTOMIZE_VERSION)/kustomize_v$(KUSTOMIZE_VERSION)_linux_amd64.tar.gz | tar -xz -C $(BIN_DIR)
 
-STATICCHECK = $(shell pwd)/bin/staticcheck
+STATICCHECK = $(BIN_DIR)/staticcheck
 .PHONY: staticcheck
 staticcheck:
 	$(call go-install-tool,$(STATICCHECK),honnef.co/go/tools/cmd/staticcheck@latest)
 
-NILERR = $(shell pwd)/bin/nilerr
+NILERR = $(BIN_DIR)/nilerr
 .PHONY: nilerr
 nilerr:
 	$(call go-install-tool,$(NILERR),github.com/gostaticanalysis/nilerr/cmd/nilerr@latest)
+
+.PHONY: setup
+setup: staticcheck nilerr kustomize controller-gen
+	mkdir -p ${ENVTEST_ASSETS_DIR}
+	curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v$(CONTROLLER_RUNTIME_VERSION)/hack/setup-envtest.sh
 
 .PHONY: clean
 clean:

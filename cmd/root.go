@@ -3,12 +3,11 @@ package cmd
 import (
 	"flag"
 	"fmt"
-	"github.com/cybozu-go/pod-security-admission/hooks"
-	"io/ioutil"
 	"net"
 	"os"
 	"strconv"
 
+	"github.com/cybozu-go/pod-security-admission/hooks"
 	"github.com/spf13/cobra"
 	"k8s.io/klog"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
@@ -16,12 +15,12 @@ import (
 )
 
 var config struct {
-	metricsAddr           string
-	probeAddr             string
-	webhookAddr           string
-	certDir               string
-	configPath            string
-	zapOpts               zap.Options
+	metricsAddr string
+	probeAddr   string
+	webhookAddr string
+	certDir     string
+	configPath  string
+	zapOpts     zap.Options
 }
 
 var rootCmd = &cobra.Command{
@@ -38,25 +37,25 @@ var rootCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("invalid webhook address: %s, %v", config.webhookAddr, err)
 		}
-		conf, err := parseConfig(config.configPath)
+		profs, err := parseProfiles(config.configPath)
 		if err != nil {
 			return err
 		}
-		return run(h, numPort, conf)
+		return run(h, numPort, profs)
 	},
 }
 
-func parseConfig(configPath string) (*hooks.Config, error) {
-	data, err := ioutil.ReadFile(configPath)
+func parseProfiles(configPath string) ([]hooks.SecurityProfile, error) {
+	data, err := os.ReadFile(configPath)
 	if err != nil {
 		return nil, err
 	}
-	var conf hooks.Config
-	err = yaml.Unmarshal(data, &conf)
+	var profs []hooks.SecurityProfile
+	err = yaml.Unmarshal(data, &profs)
 	if err != nil {
 		return nil, err
 	}
-	return &conf, nil
+	return profs, nil
 }
 
 // Execute executes the command.

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: seccomp1
+  annotations:
+    test.pod-security.cybozu.com/message: "denied the request: spec.securityContext.seccompProfile.type: Forbidden: Localhost is not an allowed seccomp profile"
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: "Localhost"
+      localhostProfile: profiles/audit.json
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu

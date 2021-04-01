@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: non-root-group5
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu
+  initContainers:
+    - name: debug
+      image: quay.io/cybozu/ubuntu-debug
+      securityContext:
+        runAsGroup: 1000

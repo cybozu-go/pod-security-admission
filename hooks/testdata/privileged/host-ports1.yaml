@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-ports1
+  annotations:
+    test.pod-security.cybozu.com/message: "denied the request: spec.containers[0].ports[1]: Forbidden: Host port is not allowed to be used"
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: quay.io/cybozu/ubuntu
+      ports:
+        - containerPort: 9090
+        - containerPort: 8080
+          hostPort: 80
