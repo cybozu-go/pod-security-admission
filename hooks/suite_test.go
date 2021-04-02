@@ -107,26 +107,20 @@ var _ = BeforeSuite(func() {
 	wh := mgr.GetWebhookServer()
 	baselineProfile := SecurityProfile{
 		Name: "baseline",
-		Capabilities: CapabilityProfile{
-			AllowedCapabilities: []string{
-				"SYSLOG",
+		AdditionalCapabilities: []string{
+			"SYSLOG",
+		},
+		NonCoreVolumeTypes: true,
+		AllowedHostPorts: []validators.PortRange{
+			{
+				Min: 65500,
+				Max: 65502,
 			},
 		},
-		Volumes: VolumeProfile{NonCoreVolumeTypes: true},
-		HostPorts: HostPortProfile{
-			AllowedHostPorts: []validators.PortRange{
-				{
-					Min: 65500,
-					Max: 65502,
-				},
-			},
-		},
-		RootGroups:          true,
-		UnsafeSeccomp:       true,
-		PrivilegeEscalation: true,
-		Users: UserProfile{
-			RunAsRoot: true,
-		},
+		RootGroups:               true,
+		Seccomp:                  true,
+		AllowPrivilegeEscalation: true,
+		RunAsRoot:                true,
 	}
 	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(baselineValidatingWebhookPath), dec, baselineProfile))
 	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(baselineMutatingWebhookPath), dec, baselineProfile))
@@ -137,10 +131,8 @@ var _ = BeforeSuite(func() {
 	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(restrictedMutatingWebhookPath), dec, restrictedProfile))
 
 	mutatingProfile := SecurityProfile{
-		Name: "mutating",
-		Users: UserProfile{
-			ForceRunAsNonRoot: true,
-		},
+		Name:              "mutating",
+		ForceRunAsNonRoot: true,
 	}
 	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(mutatingValidatingWebhookPath), dec, mutatingProfile))
 	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(mutatingMutatingWebhookPath), dec, mutatingProfile))

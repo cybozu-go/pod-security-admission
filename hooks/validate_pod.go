@@ -39,43 +39,43 @@ func createValidators(prof SecurityProfile) []validators.Validator {
 	if !prof.HostNamespace {
 		list = append(list, validators.DenyHostNamespace{})
 	}
-	if !prof.PrivilegedContainers {
+	if !prof.Privileged {
 		list = append(list, validators.DenyPrivilegedContainers{})
 	}
-	if !prof.Capabilities.UnsafeCapabilities {
-		list = append(list, validators.NewDenyUnsafeCapabilities(prof.Capabilities.AllowedCapabilities))
+	if !prof.Capabilities {
+		list = append(list, validators.NewDenyUnsafeCapabilities(prof.AdditionalCapabilities))
 	}
-	if !prof.Volumes.HostPathVolumes {
+	if !prof.HostPathVolumes {
 		list = append(list, validators.DenyHostPathVolumes{})
 	}
-	if !prof.HostPorts.HostPorts {
-		list = append(list, validators.NewDenyHostPorts(prof.HostPorts.AllowedHostPorts))
+	if !prof.HostPorts {
+		list = append(list, validators.NewDenyHostPorts(prof.AllowedHostPorts))
 	}
-	if !prof.UnsafeAppArmor {
+	if !prof.AppArmor {
 		list = append(list, validators.DenyUnsafeAppArmor{})
 	}
-	if !prof.UnsafeSELinux {
+	if !prof.SELinux {
 		list = append(list, validators.DenyUnsafeSELinux{})
 	}
-	if !prof.UnsafeProcMount {
+	if !prof.ProcMount {
 		list = append(list, validators.DenyUnsafeProcMount{})
 	}
-	if !prof.UnsafeSysctls {
+	if !prof.Sysctls {
 		list = append(list, validators.DenyUnsafeSysctls{})
 	}
-	if !prof.Volumes.NonCoreVolumeTypes {
+	if !prof.NonCoreVolumeTypes {
 		list = append(list, validators.DenyNonCoreVolumeTypes{})
 	}
-	if !prof.PrivilegeEscalation {
+	if !prof.AllowPrivilegeEscalation {
 		list = append(list, validators.DenyPrivilegeEscalation{})
 	}
-	if !prof.Users.RunAsRoot {
+	if !prof.RunAsRoot {
 		list = append(list, validators.DenyRunAsRoot{})
 	}
 	if !prof.RootGroups {
 		list = append(list, validators.DenyRootGroups{})
 	}
-	if !prof.UnsafeSeccomp {
+	if !prof.Seccomp {
 		list = append(list, validators.DenyUnsafeSeccomp{})
 	}
 	return list
