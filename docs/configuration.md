@@ -55,7 +55,7 @@ The profile describes only the allowed items. A false or no description indicate
   forceRunAsNonRoot: true
 ```
 
-For example, administrators can customize the profile.
+Administrators can customize the profile if needed.
 The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET_ADMIN` capabilities, use of hostPorts from 1024 to 65535.
 
 ```yaml
