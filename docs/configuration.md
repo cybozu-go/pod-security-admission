@@ -41,7 +41,7 @@ Customize Profile
 -----------------
 
 By default, `pod-security-admission` uses the following configuration to enforce [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/):
-The profile is described only the items to be allowed. A false or no description indicates that the item is to be denied.
+The profile describes only the allowed items. A false or no description indicates that the item is to be denied.
 
 
 ```yaml
