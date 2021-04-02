@@ -1,28 +1,29 @@
 [![GitHub release](https://img.shields.io/github/release/cybozu-go/pod-security-admission.svg?maxAge=60)][releases]
-[![CircleCI](https://circleci.com/gh/cybozu-go/pod-security-admission.svg?style=svg)](https://circleci.com/gh/cybozu-go/pod-security-admission)
+![CI](https://github.com/cybozu-go/pod-security-admission/workflows/CI/badge.svg)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/cybozu-go/pod-security-admission?tab=overview)](https://pkg.go.dev/github.com/cybozu-go/pod-security-admission?tab=overview)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cybozu-go/pod-security-admission)](https://goreportcard.com/report/github.com/cybozu-go/pod-security-admission)
 
 Pod Security Admission
 ======================
 
-**Project Status**: Initial development
+**Project Status**: Under development
 
-`pod-security-admission` is composed of [validation and mutating admission webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to ensure [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/).
+pod-security-admission is a set of [Kubernetes Admission Webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to ensure [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/).
 
-The enforcement of security settings for Pods has previously been achieved using [Pod Security Policy (PSP)](https://kubernetes.io/docs/concepts/policy/pod-security-policy/).
-However, it was [announced](https://github.com/kubernetes/kubernetes/pull/97171) that PSP is going to be removed in Kubernetes 1.25.
+pod-security-admission aims to be a simple [Pod Security Policy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) replacement.
 
-`pod-security-admission` provides an enforcement of [simple Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/) as admission webhook.
+This is not a policy engine and users cannot write their own policies flexibly.
+If you want to do that, I recommend using a policy engine such as [OPA/GateKeeper](https://open-policy-agent.github.io/gatekeeper) and [Kyverno](https://kyverno.io).
 
-`pod-security-admission` is not a policy engine and users cannot write their own policies flexibly.
-It does not provide flexible policy changes.
-If you want to do that, I recommend using a policy engine such as [OPA GateKeeper](https://github.com/open-policy-agent/gatekeeper).
+Getting started
+---------------
 
-Webhooks
+Please see the [getting-started.md](./docs/getting-started.md) to deploy `pod-security-admission` to your Kubernetes cluster.
+
+Policies
 --------
 
-`pod-security-admission` provides 3 policy types based on Pod Security Standards.
+pod-security-admission provides 3 policy types based on Pod Security Standards.
 
 ### Privileged
 
@@ -73,7 +74,7 @@ metadata:
 Documentation
 -------------
 
-[docs](docs/) directory contains documents about specifications.
+[docs](docs/) directory contains documents about designs and specifications.
 
 Docker images
 -------------
