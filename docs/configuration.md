@@ -80,7 +80,7 @@ The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET
 
 You can configure [ValidatingWebhookConfiguration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#validatingwebhookconfiguration-v1-admissionregistration-k8s-io) and [MutatingWebhookConfiguration](https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#mutatingwebhookconfiguration-v1-admissionregistration-k8s-io) to change which Pods are covered by each policy.
 
-See [manifests.yaml](../config/webhook/manifests.yaml) in details.
+See [manifests.yaml](../config/webhook/manifests.yaml) for details.
 
 The endpoint of the webhook is determined by the name of the policy, such as `baseline` and `restricted`. 
 A validating webhook will be `/validate-` + the policy name, a mutating webhook will be `/mutate-` + the policy name.

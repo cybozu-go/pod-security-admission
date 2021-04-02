@@ -32,4 +32,4 @@ Flags:
 ```
 
 The configuration file for the policy rule can be specified with `--config-path` option.
-See [configuration.md](./configuration.md) in details.
+See [configuration.md](./configuration.md) for details.
