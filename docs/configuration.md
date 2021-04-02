@@ -8,43 +8,27 @@ SecurityProfile
 
 SecurityProfile has these fields:
 
-| Name                 | Type              | Description                                                |
-| -------------------- | ----------------- | ---------------------------------------------------------- |
-| name                 | string            | The name of the profile                                    |
-| hostNamespace        | bool              | Allow sharing the host namespaces                          |
-| privilegedContainers | bool              | Allow privileged containers                                |
-| capabilities         | CapabilityProfile | The profile for capabilities                               |
-| volumes              | VolumeProfile     | The profile for volumes                                    |
-| hostPorts            | HostPortProfile   | The profile for hostPorts                                  |
-| unsafeApparmor       | bool              | Allow overriding or disabling the default AppArmor profile |
-| unsafeSelinux        | bool              | Allow setting custom SELinux options                       |
-| unsafeProcMount      | bool              | Allow unmasked proc mount                                  |
-| unsafeSysctls        | bool              | Allow usage of unsafe sysctls                              |
-| privilegeEscalation  | bool              | Allow privilege escalation                                 |
-| users                | UserProfile       | The profile for users                                      |
-| rootGroups           | bool              | Allow running with a root primary or supplementary GID     |
-| unsafeSeccomp        | bool              | Allow usage of non-default Seccomp profile                 |
+| Name                     | Type        | Description                                                                                                                                 |
+| ------------------------ | ----------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| name                     | string      | The name of the profile                                                                                                                     |
+| hostNamespace            | bool        | Allow sharing the host namespaces                                                                                                           |
+| privileged               | bool        | Allow privileged containers                                                                                                                 |
+| capabilities             | bool        | Allow adding capabilities beyond the [default set](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities). |
+| additionalCapabilities   | []string    | The list of capabilities that cab be added. If `capabilities` is true, this list will be ignored.                                           |
+| hostPathVolumes          | bool        | Allow usage of HostPath volumes                                                                                                             |
+| nonCoreVolumeTypes       | bool        | Allow usage of non-core volume types                                                                                                        |
+| hostPorts                | bool        | Allow usage of all HostPorts                                                                                                                |
+| allowedHostPorts         | []PortRange | The list of host ports that can be used. If `hostPorts` is true, this list will be ignored.                                                 |
+| appArmor                 | bool        | Allow overriding or disabling the default AppArmor profile                                                                                  |
+| seLinux                  | bool        | Allow setting custom SELinux options                                                                                                        |
+| procMount                | bool        | Allow unmasked proc mount                                                                                                                   |
+| sysctls                  | bool        | Allow usage of unsafe sysctls                                                                                                               |
+| allowPrivilegeEscalation | bool        | Allow privilege escalation                                                                                                                  |
+| runAsRoot                | bool        | Allow running as root users                                                                                                                 |
+| forceRunAsNonRoot        | bool        | Force running with non-root users by MutatingWebhook                                                                                        |
+| rootGroups               | bool        | Allow running with a root primary or supplementary GID                                                                                      |
+| seccomp                  | bool        | Allow usage of non-default Seccomp profile                                                                                                  |
 
-### CapabilityProfile
-
-| Name                | Type     | Description                                                                                                                                                          |
-| ------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| unsafeCapabilities  | bool     | allow adding capabilities beyond the [default set](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities) and `allowedCapabilities` |
-| allowedCapabilities | []string | The list of capabilities that cab be added                                                                                                                           |
-
-### VolumeProfile
-
-| Name               | Type | Description                          |
-| ------------------ | ---- | ------------------------------------ |
-| hostPathVolumes    | bool | Allow usage of HostPath volumes      |
-| nonCoreVolumeTypes | bool | Allow usage of non-core volume types |
-
-### HostPortProfile
-
-| Name             | Type        | Description                                            |
-| ---------------- | ----------- | ------------------------------------------------------ |
-| hostPorts        | bool        | Allow usage of HostPorts except for `allowedHostPorts` |
-| allowedHostPorts | []PortRange | The list of host ports that can be used                |
 
 ### PortRange
 
@@ -52,14 +36,6 @@ SecurityProfile has these fields:
 | ---- | ----- | -------------------------------------- |
 | min  | int32 | The min of host port range (inclusive) |
 | max  | int32 | The max of host port range (inclusive) |
-
-### UserProfile
-
-| Name              | Type | Description                                          |
-| ----------------- | ---- | ---------------------------------------------------- |
-| runAsRoot         | bool | Allow running as root users                          |
-| forceRunAsNonRoot | bool | Force running with non-root users by MutatingWebhook |
-
 
 Customize Profile
 -----------------
@@ -70,16 +46,13 @@ The profile is described only the items to be allowed. A false or no description
 
 ```yaml
 - name: baseline
-  volumes:
-    nonCoreVolumeTypes: true
-  privilegeEscalation: true
-  users:
-    runAsRoot: true
+  nonCoreVolumeTypes: true
+  allowPrivilegeEscalation: true
+  runAsRoot: true
   rootGroups: true
-  unsafeSeccomp: true
+  seccomp: true
 - name: restricted
-  users:
-    forceRunAsNonRoot: true
+  forceRunAsNonRoot: true
 ```
 
 For example, administrators can customize the profile.
@@ -87,25 +60,20 @@ The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET
 
 ```yaml
 - name: baseline
-  hostNamespaces: true
-  capabilities:
-    allowedCapabilities:
-      - SYSLOG
-      - NET_ADMIN
-  volumes:
-    nonCoreVolumeTypes: true
-  hostPorts:
-    allowedHostPorts:
-      - min: 1024
-        max: 65535
-  privilegeEscalation: true
+  hostNamespace: true
+  additionalCapabilities:
+    - SYSLOG
+    - NET_ADMIN
+  nonCoreVolumeTypes: true
+  allowedHostPorts:
+    - min: 1024
+      max: 65535
+  allowPrivilegeEscalation: true
   rootGroups: true
-  users:
-    runAsRoot: true
-  unsafeSeccomp: true
+  runAsRoot: true
+  seccomp: true
 - name: restricted
-  users:
-    forceRunAsNonRoot: true
+  forceRunAsNonRoot: true
 ```
 
 ### Webhook Configuration
