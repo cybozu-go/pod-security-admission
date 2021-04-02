@@ -39,6 +39,10 @@ Thus, by default, pod-security-admission serves four endpoints:
 - Validating webhook for `Restricted`
 - Mutating webhook for `Restricted`
 
+Why didn't we target `Privileged` pods for webhooks?
+Some privileged pods, such as CNI plugins, DNS and other system pods, need to be started before admission webhooks.
+If those pods are webhook targets, there will be a problem that those pods cannot be launched.
+
 How to specify the group of Pods to which each policy is applied
 ----------------------------------------------------------------
 

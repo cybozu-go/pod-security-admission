@@ -8,43 +8,43 @@ SecurityProfile
 
 SecurityProfile has these fields:
 
-| Name                     | Type              | Description                                               |
-| ------------------------ | ----------------- | --------------------------------------------------------- |
-| name                     | string            | The name of the profile                                   |
-| denyHostNamespace        | bool              | Deny sharing the host namespaces                          |
-| denyPrivilegedContainers | bool              | Deny privileged containers                                |
-| capabilities             | CapabilityProfile | The profile for capabilities                              |
-| volumes                  | VolumeProfile     | The profile for volumes                                   |
-| hostPorts                | HostPortProfile   | The profile for hostPorts                                 |
-| denyUnsafeApparmor       | bool              | Deny overriding or disabling the default AppArmor profile |
-| denyUnsafeSelinux        | bool              | Deny setting custom SELinux options                       |
-| denyUnsafeProcMount      | bool              | Deny unmasked proc mount                                  |
-| denyUnsafeSysctls        | bool              | Deny usage of unsafe sysctls                              |
-| denyPrivilegeEscalation  | bool              | Deny privilege escalation                                 |
-| users                    | UserProfile       | The profile for users                                     |
-| denyRootGroups           | bool              | Deny running with a root primary or supplementary GID     |
-| denyUnsafeSeccomp        | bool              | Deny usage of non-default Seccomp profile                 |
+| Name                 | Type              | Description                                                |
+| -------------------- | ----------------- | ---------------------------------------------------------- |
+| name                 | string            | The name of the profile                                    |
+| hostNamespace        | bool              | Allow sharing the host namespaces                          |
+| privilegedContainers | bool              | Allow privileged containers                                |
+| capabilities         | CapabilityProfile | The profile for capabilities                               |
+| volumes              | VolumeProfile     | The profile for volumes                                    |
+| hostPorts            | HostPortProfile   | The profile for hostPorts                                  |
+| unsafeApparmor       | bool              | Allow overriding or disabling the default AppArmor profile |
+| unsafeSelinux        | bool              | Allow setting custom SELinux options                       |
+| unsafeProcMount      | bool              | Allow unmasked proc mount                                  |
+| unsafeSysctls        | bool              | Allow usage of unsafe sysctls                              |
+| privilegeEscalation  | bool              | Allow privilege escalation                                 |
+| users                | UserProfile       | The profile for users                                      |
+| rootGroups           | bool              | Allow running with a root primary or supplementary GID     |
+| unsafeSeccomp        | bool              | Allow usage of non-default Seccomp profile                 |
 
 ### CapabilityProfile
 
-| Name                   | Type     | Description                                                                                                                                                         |
-| ---------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| denyUnsafeCapabilities | bool     | Deny adding capabilities beyond the [default set](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities) and `allowedCapabilities` |
-| allowedCapabilities    | []string | The list of capabilities that cab be added                                                                                                                          |
+| Name                | Type     | Description                                                                                                                                                          |
+| ------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| unsafeCapabilities  | bool     | allow adding capabilities beyond the [default set](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities) and `allowedCapabilities` |
+| allowedCapabilities | []string | The list of capabilities that cab be added                                                                                                                           |
 
 ### VolumeProfile
 
-| Name                   | Type | Description                         |
-| ---------------------- | ---- | ----------------------------------- |
-| denyHostPathVolumes    | bool | Deny usage of HostPath volumes      |
-| denyNonCoreVolumeTypes | bool | Deny usage of non-core volume types |
+| Name               | Type | Description                          |
+| ------------------ | ---- | ------------------------------------ |
+| hostPathVolumes    | bool | Allow usage of HostPath volumes      |
+| nonCoreVolumeTypes | bool | Allow usage of non-core volume types |
 
 ### HostPortProfile
 
-| Name             | Type        | Description                                           |
-| ---------------- | ----------- | ----------------------------------------------------- |
-| denyHostPorts    | bool        | Deny usage of HostPorts except for `allowedHostPorts` |
-| allowedHostPorts | []PortRange | The list of host ports that can be used               |
+| Name             | Type        | Description                                            |
+| ---------------- | ----------- | ------------------------------------------------------ |
+| hostPorts        | bool        | Allow usage of HostPorts except for `allowedHostPorts` |
+| allowedHostPorts | []PortRange | The list of host ports that can be used                |
 
 ### PortRange
 
@@ -57,7 +57,7 @@ SecurityProfile has these fields:
 
 | Name              | Type | Description                                          |
 | ----------------- | ---- | ---------------------------------------------------- |
-| denyRunAsRoot     | bool | Deny running as root users                           |
+| runAsRoot         | bool | Allow running as root users                          |
 | forceRunAsNonRoot | bool | Force running with non-root users by MutatingWebhook |
 
 
@@ -65,64 +65,47 @@ Customize Profile
 -----------------
 
 By default, `pod-security-admission` uses the following configuration to enforce [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/):
+The profile is described only the items to be allowed. A false or no description indicates that the item is to be denied.
+
 
 ```yaml
 - name: baseline
-  denyHostNamespace: true
-  denyPrivilegedContainers: true
-  capabilities:
-    denyUnsafeCapabilities: true
   volumes:
-    denyHostPathVolumes: true
-  hostPorts:
-    denyHostPorts: true
-  denyUnsafeApparmor: true
-  denyUnsafeSelinux: true
-  denyUnsafeProcMount: true
-  denyUnsafeSysctls: true
-- name: restricted
-  volumes:
-    denyNonCoreVolumeTypes: true
-  denyPrivilegeEscalation: true
+    nonCoreVolumeTypes: true
+  privilegeEscalation: true
   users:
-    denyRunAsRoot: true
-  denyRootGroups: true
-  denyUnsafeSeccomp: true
+    runAsRoot: true
+  rootGroups: true
+  unsafeSeccomp: true
+- name: restricted
+  users:
+    forceRunAsNonRoot: true
 ```
 
-For example, administrators can customize the profile under the `Baseline` section as follows.
-This profile allows to add `SYSLOG` and `NET_ADMIN` capability, use of hostPort from 1024 to 65535.
-It also forces run as non-root user.
+For example, administrators can customize the profile.
+The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET_ADMIN` capability, use of hostPort from 1024 to 65535.
 
 ```yaml
 - name: baseline
-  denyHostNamespace: true
-  denyPrivilegedContainers: true
+  hostNamespaces: true
   capabilities:
-    denyUnsafeCapabilities: true
     allowedCapabilities:
       - SYSLOG
       - NET_ADMIN
   volumes:
-    denyHostPathVolumes: true
+    nonCoreVolumeTypes: true
   hostPorts:
-    denyHostPorts: true
     allowedHostPorts:
       - min: 1024
         max: 65535
-  denyUnsafeApparmor: true
-  denyUnsafeSelinux: true
-  denyUnsafeProcMount: true
-  denyUnsafeSysctls: true
+  privilegeEscalation: true
+  rootGroups: true
   users:
-    denyRunAsRoot: true
-    forceRunAsNonRoot: true
+    runAsRoot: true
+  unsafeSeccomp: true
 - name: restricted
-  volumes:
-    denyNonCoreVolumeTypes: true
-  denyPrivilegeEscalation: true
-  denyRootGroups: true
-  denyUnsafeSeccomp: true
+  users:
+    forceRunAsNonRoot: true
 ```
 
 ### Webhook Configuration
