@@ -36,46 +36,46 @@ func NewPodValidator(c client.Client, log logr.Logger, dec *admission.Decoder, p
 
 func createValidators(prof SecurityProfile) []validators.Validator {
 	list := make([]validators.Validator, 0)
-	if prof.DenyHostNamespace {
+	if !prof.HostNamespace {
 		list = append(list, validators.DenyHostNamespace{})
 	}
-	if prof.DenyPrivilegedContainers {
+	if !prof.Privileged {
 		list = append(list, validators.DenyPrivilegedContainers{})
 	}
-	if prof.Capabilities.DenyUnsafeCapabilities || len(prof.Capabilities.AllowedCapabilities) > 0 {
-		list = append(list, validators.NewDenyUnsafeCapabilities(prof.Capabilities.AllowedCapabilities))
+	if !prof.Capabilities {
+		list = append(list, validators.NewDenyUnsafeCapabilities(prof.AdditionalCapabilities))
 	}
-	if prof.Volumes.DenyHostPathVolumes {
+	if !prof.HostPathVolumes {
 		list = append(list, validators.DenyHostPathVolumes{})
 	}
-	if prof.HostPorts.DenyHostPorts || len(prof.HostPorts.AllowedHostPorts) > 0 {
-		list = append(list, validators.NewDenyHostPorts(prof.HostPorts.AllowedHostPorts))
+	if !prof.HostPorts {
+		list = append(list, validators.NewDenyHostPorts(prof.AllowedHostPorts))
 	}
-	if prof.DenyUnsafeAppArmor {
+	if !prof.AppArmor {
 		list = append(list, validators.DenyUnsafeAppArmor{})
 	}
-	if prof.DenyUnsafeSELinux {
+	if !prof.SELinux {
 		list = append(list, validators.DenyUnsafeSELinux{})
 	}
-	if prof.DenyUnsafeProcMount {
+	if !prof.ProcMount {
 		list = append(list, validators.DenyUnsafeProcMount{})
 	}
-	if prof.DenyUnsafeSysctls {
+	if !prof.Sysctls {
 		list = append(list, validators.DenyUnsafeSysctls{})
 	}
-	if prof.Volumes.DenyNonCoreVolumeTypes {
+	if !prof.NonCoreVolumeTypes {
 		list = append(list, validators.DenyNonCoreVolumeTypes{})
 	}
-	if prof.DenyPrivilegeEscalation {
+	if !prof.AllowPrivilegeEscalation {
 		list = append(list, validators.DenyPrivilegeEscalation{})
 	}
-	if prof.Users.DenyRunAsRoot || prof.Users.ForceRunAsNonRoot {
+	if !prof.RunAsRoot {
 		list = append(list, validators.DenyRunAsRoot{})
 	}
-	if prof.DenyRootGroups {
+	if !prof.RootGroups {
 		list = append(list, validators.DenyRootGroups{})
 	}
-	if prof.DenyUnsafeSeccomp {
+	if !prof.Seccomp {
 		list = append(list, validators.DenyUnsafeSeccomp{})
 	}
 	return list

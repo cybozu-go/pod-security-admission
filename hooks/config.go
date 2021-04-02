@@ -6,37 +6,21 @@ import "github.com/cybozu-go/pod-security-admission/hooks/validators"
 type SecurityProfile struct {
 	Name string `json:"name"`
 
-	DenyHostNamespace        bool              `json:"denyHostNamespace"`
-	DenyPrivilegedContainers bool              `json:"denyPrivilegedContainers"`
-	Capabilities             CapabilityProfile `json:"capabilities"`
-	Volumes                  VolumeProfile     `json:"volumes"`
-	HostPorts                HostPortProfile   `json:"hostPorts"`
-	DenyUnsafeAppArmor       bool              `json:"denyUnsafeAppArmor"`
-	DenyUnsafeSELinux        bool              `json:"denyUnsafeSELinux"`
-	DenyUnsafeProcMount      bool              `json:"denyUnsafeProcMount"`
-	DenyUnsafeSysctls        bool              `json:"denyUnsafeSysctls"`
-	DenyPrivilegeEscalation  bool              `json:"denyPrivilegeEscalation"`
-	Users                    UserProfile       `json:"users"`
-	DenyRootGroups           bool              `json:"denyRootGroups"`
-	DenyUnsafeSeccomp        bool              `json:"denyUnsafeSeccomp"`
-}
-
-type VolumeProfile struct {
-	DenyHostPathVolumes    bool `json:"denyHostPathVolumes"`
-	DenyNonCoreVolumeTypes bool `json:"denyNonCoreVolumeTypes"`
-}
-
-type HostPortProfile struct {
-	DenyHostPorts    bool                   `json:"denyHostPorts"`
-	AllowedHostPorts []validators.PortRange `json:"allowedHostPorts"`
-}
-
-type CapabilityProfile struct {
-	DenyUnsafeCapabilities bool     `json:"denyUnsafeCapabilities"`
-	AllowedCapabilities    []string `json:"allowedCapabilities"`
-}
-
-type UserProfile struct {
-	DenyRunAsRoot     bool `json:"denyRunAsRoot"`
-	ForceRunAsNonRoot bool `json:"forceRunAsNonRoot"`
+	HostNamespace            bool                   `json:"hostNamespace"`
+	Privileged               bool                   `json:"privileged"`
+	Capabilities             bool                   `json:"capabilities"`
+	AdditionalCapabilities   []string               `json:"additionalCapabilities"`
+	HostPathVolumes          bool                   `json:"hostPathVolumes"`
+	NonCoreVolumeTypes       bool                   `json:"nonCoreVolumeTypes"`
+	HostPorts                bool                   `json:"hostPorts"`
+	AllowedHostPorts         []validators.PortRange `json:"allowedHostPorts"`
+	AppArmor                 bool                   `json:"appArmor"`
+	SELinux                  bool                   `json:"seLinux"`
+	ProcMount                bool                   `json:"procMount"`
+	Sysctls                  bool                   `json:"sysctls"`
+	AllowPrivilegeEscalation bool                   `json:"allowPrivilegeEscalation"`
+	RunAsRoot                bool                   `json:"runAsRoot"`
+	ForceRunAsNonRoot        bool                   `json:"forceRunAsNonRoot"`
+	RootGroups               bool                   `json:"rootGroups"`
+	Seccomp                  bool                   `json:"seccomp"`
 }
