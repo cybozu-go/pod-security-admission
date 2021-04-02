@@ -106,18 +106,14 @@ var _ = BeforeSuite(func() {
 	Expect(err).NotTo(HaveOccurred())
 	wh := mgr.GetWebhookServer()
 	baselineProfile := SecurityProfile{
-		Name:                     "baseline",
-		DenyHostNamespace:        true,
-		DenyPrivilegedContainers: true,
+		Name: "baseline",
 		Capabilities: CapabilityProfile{
-			DenyUnsafeCapabilities: true,
 			AllowedCapabilities: []string{
 				"SYSLOG",
 			},
 		},
-		Volumes: VolumeProfile{DenyHostPathVolumes: true},
+		Volumes: VolumeProfile{NonCoreVolumeTypes: true},
 		HostPorts: HostPortProfile{
-			DenyHostPorts: true,
 			AllowedHostPorts: []validators.PortRange{
 				{
 					Min: 65500,
@@ -125,20 +121,17 @@ var _ = BeforeSuite(func() {
 				},
 			},
 		},
-		DenyUnsafeAppArmor:  true,
-		DenyUnsafeSELinux:   true,
-		DenyUnsafeProcMount: true,
-		DenyUnsafeSysctls:   true,
+		RootGroups:          true,
+		UnsafeSeccomp:       true,
+		PrivilegeEscalation: true,
+		Users: UserProfile{
+			RunAsRoot: true,
+		},
 	}
 	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(baselineValidatingWebhookPath), dec, baselineProfile))
 	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(baselineMutatingWebhookPath), dec, baselineProfile))
 	restrictedProfile := SecurityProfile{
-		Name:                    "restricted",
-		Volumes:                 VolumeProfile{DenyNonCoreVolumeTypes: true},
-		DenyPrivilegeEscalation: true,
-		Users:                   UserProfile{DenyRunAsRoot: true},
-		DenyRootGroups:          true,
-		DenyUnsafeSeccomp:       true,
+		Name: "restricted",
 	}
 	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(restrictedValidatingWebhookPath), dec, restrictedProfile))
 	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(restrictedMutatingWebhookPath), dec, restrictedProfile))
@@ -146,7 +139,6 @@ var _ = BeforeSuite(func() {
 	mutatingProfile := SecurityProfile{
 		Name: "mutating",
 		Users: UserProfile{
-			DenyRunAsRoot:     true,
 			ForceRunAsNonRoot: true,
 		},
 	}
