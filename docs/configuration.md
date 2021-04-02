@@ -83,7 +83,7 @@ The profile is described only the items to be allowed. A false or no description
 ```
 
 For example, administrators can customize the profile.
-The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET_ADMIN` capability, use of hostPort from 1024 to 65535.
+The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET_ADMIN` capabilities, use of hostPorts from 1024 to 65535.
 
 ```yaml
 - name: baseline

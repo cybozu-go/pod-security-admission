@@ -39,9 +39,10 @@ Thus, by default, pod-security-admission serves four endpoints:
 - Validating webhook for `Restricted`
 - Mutating webhook for `Restricted`
 
-Why didn't we target `Privileged` pods for webhooks?
+Why didn't we provide webhooks for `Privileged`?
 Some privileged pods, such as CNI plugins, DNS and other system pods, need to be started before admission webhooks.
 If those pods are webhook targets, there will be a problem that those pods cannot be launched.
+Therefore, we will achieve `Privileged` by not applying webhooks.
 
 How to specify the group of Pods to which each policy is applied
 ----------------------------------------------------------------
@@ -55,4 +56,4 @@ they would be able to avoid applying the policy.
 Cluster administrator must properly manage the permissions of namespace resources.
 
 In PSP, you can do it with binding ServiceAccount to the profile using [RBAC](https://kubernetes.io/docs/reference/access-authn-authz/rbac/).
-pod security admission does not provide that mechanism.
+pod-security-admission does not provide that mechanism.
