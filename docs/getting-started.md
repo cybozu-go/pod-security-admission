@@ -42,5 +42,5 @@ Now if you create a Pod that violates the policy, it will be rejected.
 
 ```console
 $ kubectl apply -f hooks/testdata/restricted/additional-capability.yaml
-Error from server (spec.containers[0].securityContext.capabilities.add[1]: Forbidden: Adding capability SYSLOG is not allowed): error when creating "hooks/testdata/restricted/additional-capability.yaml": admission webhook "baseline.vpod.kb.io" denied the request: spec.containers[0].securityContext.capabilities.add[1]: Forbidden: Adding capability SYSLOG is not allowed
+Error from server (spec.containers[0].securityContext.capabilities.add[1]: Forbidden: Adding capability SYSLOG is not allowed): error when creating "hooks/testdata/baseline/additional-capability.yaml": admission webhook "baseline.vpod.kb.io" denied the request: spec.containers[0].securityContext.capabilities.add[1]: Forbidden: Adding capability SYSLOG is not allowed
 ```
