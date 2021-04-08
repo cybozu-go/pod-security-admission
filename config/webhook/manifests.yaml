@@ -15,6 +15,7 @@ webhooks:
         namespace: system
         path: /mutate-baseline
     failurePolicy: Fail
+    reinvocationPolicy: IfNeeded
     rules:
       - apiGroups:
           - ""
@@ -41,6 +42,7 @@ webhooks:
         namespace: system
         path: /mutate-restricted
     failurePolicy: Fail
+    reinvocationPolicy: IfNeeded
     rules:
       - apiGroups:
           - ""

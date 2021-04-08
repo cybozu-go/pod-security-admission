@@ -1,7 +1,7 @@
 Release procedure
 =================
 
-This document describes how to release a new version of neco-template.
+This document describes how to release a new version of pod-security-admission.
 
 Versioning
 ----------
@@ -37,6 +37,8 @@ Bump version
 1. Checkout `main` branch.
 1. Make a branch to release, for example by `git neco dev "$VERSION"`
 1. Edit `CHANGELOG.md` for the new version ([example][]).
+1. Edit `version.go` for the new version.
+1. Edit `config/manager/kustomization.yaml` and update newTag value for the new version.
 1. Commit the change and push it.
 
     ```console
@@ -51,12 +53,12 @@ Bump version
     $ git tag "v$VERSION"
     $ git push origin "v$VERSION"
 
-Now the version is bumped up and the latest container image is uploaded to [quay.io](https://quay.io/cybozu/neco-template).
+Now the version is bumped up and the latest container image is uploaded to [quay.io](https://quay.io/cybozu/pod-security-admission).
 
 Publish GitHub release page
 ---------------------------
 
-Go to https://github.com/cybozu-go/neco-template/releases and edit the tag.
+Go to https://github.com/cybozu-go/pod-security-admission/releases and edit the tag.
 Finally, press `Publish release` button.
 
 

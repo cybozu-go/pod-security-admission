@@ -1,0 +1,8 @@
+- name: baseline
+  nonCoreVolumeTypes: true
+  allowPrivilegeEscalation: true
+  runAsRoot: true
+  rootGroups: true
+  seccomp: true
+- name: restricted
+  forceRunAsNonRoot: true
