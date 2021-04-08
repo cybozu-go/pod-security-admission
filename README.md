@@ -1,12 +1,16 @@
+[![Project Status](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![GitHub release](https://img.shields.io/github/release/cybozu-go/pod-security-admission.svg?maxAge=60)][releases]
 ![CI](https://github.com/cybozu-go/pod-security-admission/workflows/CI/badge.svg)
 [![PkgGoDev](https://pkg.go.dev/badge/github.com/cybozu-go/pod-security-admission?tab=overview)](https://pkg.go.dev/github.com/cybozu-go/pod-security-admission?tab=overview)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cybozu-go/pod-security-admission)](https://goreportcard.com/report/github.com/cybozu-go/pod-security-admission)
 
+***NOTE***
+
+The PSP replacement has been [announced](https://kubernetes.io/blog/2021/04/06/podsecuritypolicy-deprecation-past-present-and-future/).
+This project is just a stopgap until it is replaced.
+
 Pod Security Admission
 ======================
-
-**Project Status**: Under development
 
 pod-security-admission is a set of [Kubernetes Admission Webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to ensure [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/).
 
