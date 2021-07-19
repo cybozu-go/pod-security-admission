@@ -15,9 +15,6 @@ func (v DenyNonCoreVolumeTypes) Validate(ctx context.Context, pod *corev1.Pod) f
 	var errs field.ErrorList
 
 	for i, vol := range pod.Spec.Volumes {
-		if vol.HostPath != nil {
-			errs = append(errs, field.Forbidden(p.Index(i), "Volume type HostPath is not allowed to be used"))
-		}
 		if vol.GCEPersistentDisk != nil {
 			errs = append(errs, field.Forbidden(p.Index(i), "Volume type GCEPersistentDisk is not allowed to be used"))
 		}

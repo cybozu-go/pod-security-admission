@@ -46,7 +46,7 @@ func createValidators(prof SecurityProfile) []validators.Validator {
 		list = append(list, validators.NewDenyUnsafeCapabilities(prof.AdditionalCapabilities))
 	}
 	if !prof.HostPathVolumes {
-		list = append(list, validators.DenyHostPathVolumes{})
+		list = append(list, validators.NewDenyHostPaths(prof.AllowedHostPaths))
 	}
 	if !prof.HostPorts {
 		list = append(list, validators.NewDenyHostPorts(prof.AllowedHostPorts))
