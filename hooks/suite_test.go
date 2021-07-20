@@ -36,6 +36,8 @@ import (
 var (
 	baselineMutatingWebhookPath     = "/mutate-baseline"
 	baselineValidatingWebhookPath   = "/validate-baseline"
+	hostpathMutatingWebhookPath     = "/mutate-hostpath"
+	hostpathValidatingWebhookPath   = "/validate-hostpath"
 	restrictedMutatingWebhookPath   = "/mutate-restricted"
 	restrictedValidatingWebhookPath = "/validate-restricted"
 	mutatingMutatingWebhookPath     = "/mutate-mutating"
@@ -65,7 +67,6 @@ var _ = BeforeSuite(func() {
 		CRDDirectoryPaths: []string{filepath.Join("..", "config", "crd", "bases")},
 		WebhookInstallOptions: envtest.WebhookInstallOptions{
 			Paths: []string{
-				filepath.Join("..", "config", "webhook"),
 				filepath.Join("testdata", "config"),
 			},
 		},
@@ -105,6 +106,7 @@ var _ = BeforeSuite(func() {
 	dec, err := admission.NewDecoder(scheme)
 	Expect(err).NotTo(HaveOccurred())
 	wh := mgr.GetWebhookServer()
+
 	baselineProfile := SecurityProfile{
 		Name: "baseline",
 		AdditionalCapabilities: []string{
@@ -124,6 +126,33 @@ var _ = BeforeSuite(func() {
 	}
 	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(baselineValidatingWebhookPath), dec, baselineProfile))
 	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(baselineMutatingWebhookPath), dec, baselineProfile))
+
+	// "hostpath" profile = "baseline" profile + AllowedHostPaths
+	hostpathProfile := SecurityProfile{
+		Name: "hostpath",
+		AdditionalCapabilities: []string{
+			"SYSLOG",
+		},
+		NonCoreVolumeTypes: true,
+		AllowedHostPaths: []validators.AllowedHostPath{
+			{
+				PathPrefix: "/etc/hos", // not "host"
+			},
+		},
+		AllowedHostPorts: []validators.PortRange{
+			{
+				Min: 65500,
+				Max: 65502,
+			},
+		},
+		RootGroups:               true,
+		Seccomp:                  true,
+		AllowPrivilegeEscalation: true,
+		RunAsRoot:                true,
+	}
+	wh.Register(hostpathValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(hostpathValidatingWebhookPath), dec, hostpathProfile))
+	wh.Register(hostpathMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(hostpathMutatingWebhookPath), dec, hostpathProfile))
+
 	restrictedProfile := SecurityProfile{
 		Name: "restricted",
 	}

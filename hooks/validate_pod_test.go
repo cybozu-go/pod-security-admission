@@ -40,18 +40,28 @@ func validatePod(dir string, namespace string, allowed bool) {
 var _ = Describe("validate Pod webhook", func() {
 	It("should allow all pods in privileged namespace", func() {
 		validatePod(filepath.Join("testdata", "privileged"), "privileged", true)
+		validatePod(filepath.Join("testdata", "hostpath"), "privileged", true)
 		validatePod(filepath.Join("testdata", "baseline"), "privileged", true)
 		validatePod(filepath.Join("testdata", "restricted"), "privileged", true)
 	})
 
-	It("should deny privileged pods in baseline namespace", func() {
+	It("should deny privileged pods in hostpath namespace", func() {
+		validatePod(filepath.Join("testdata", "privileged"), "hostpath", false)
+		validatePod(filepath.Join("testdata", "hostpath"), "hostpath", true)
+		validatePod(filepath.Join("testdata", "baseline"), "hostpath", true)
+		validatePod(filepath.Join("testdata", "restricted"), "hostpath", true)
+	})
+
+	It("should deny privileged and hostpath pods in baseline namespace", func() {
 		validatePod(filepath.Join("testdata", "privileged"), "baseline", false)
+		validatePod(filepath.Join("testdata", "hostpath"), "baseline", false)
 		validatePod(filepath.Join("testdata", "baseline"), "baseline", true)
 		validatePod(filepath.Join("testdata", "restricted"), "baseline", true)
 	})
 
-	It("should deny privileged and baseline pods in restricted namespace", func() {
+	It("should deny privileged, hostpath, and baseline pods in restricted namespace", func() {
 		validatePod(filepath.Join("testdata", "privileged"), "restricted", false)
+		validatePod(filepath.Join("testdata", "hostpath"), "restricted", false)
 		validatePod(filepath.Join("testdata", "baseline"), "restricted", false)
 		validatePod(filepath.Join("testdata", "restricted"), "restricted", true)
 	})
