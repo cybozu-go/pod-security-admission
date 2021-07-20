@@ -15,7 +15,7 @@ SecurityProfile has these fields:
 | privileged               | bool              | Allow privileged containers                                                                                                                 |
 | capabilities             | bool              | Allow adding capabilities beyond the [default set](https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities). |
 | additionalCapabilities   | []string          | The list of capabilities that cab be added. If `capabilities` is true, this list will be ignored.                                           |
-| hostPathVolumes          | bool              | Allow usage of HostPath volumes                                                                                                             |
+| hostPathVolumes          | bool              | Allow usage of all HostPath volumes                                                                                                         |
 | allowedHostPaths         | []AllowedHostPath | The list of host paths that can be used. If `hostPathVolumes` is true, this list will be ignored.                                           |
 | nonCoreVolumeTypes       | bool              | Allow usage of non-core volume types, except HostPath volumes                                                                               |
 | hostPorts                | bool              | Allow usage of all HostPorts                                                                                                                |

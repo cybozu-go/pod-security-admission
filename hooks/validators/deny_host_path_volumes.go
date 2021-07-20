@@ -31,17 +31,13 @@ volume_for:
 		if vol.HostPath == nil {
 			continue
 		}
-		if v.allowedHostPaths == nil {
-			errs = append(errs, field.Forbidden(p.Index(i), "HostPath is not allowed to be used"))
-		} else {
-			pathstr := vol.HostPath.Path
-			for _, allowed := range v.allowedHostPaths {
-				if strings.HasPrefix(pathstr, allowed.PathPrefix) && (len(pathstr) == len(allowed.PathPrefix) || []rune(pathstr)[len(allowed.PathPrefix)] == filepath.Separator) {
-					continue volume_for
-				}
+		pathstr := vol.HostPath.Path
+		for _, allowed := range v.allowedHostPaths {
+			if strings.HasPrefix(pathstr, allowed.PathPrefix) && (len(pathstr) == len(allowed.PathPrefix) || []rune(pathstr)[len(allowed.PathPrefix)] == filepath.Separator) {
+				continue volume_for
 			}
-			errs = append(errs, field.Forbidden(p.Index(i), "HostPath is not allowed to be used"))
 		}
+		errs = append(errs, field.Forbidden(p.Index(i), "HostPath is not allowed to be used"))
 	}
 	return errs
 }
