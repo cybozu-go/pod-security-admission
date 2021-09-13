@@ -85,4 +85,9 @@ Docker images
 
 Docker images are available on [Quay.io](https://quay.io/repository/cybozu/pod-security-admission)
 
+License
+-------
+
+pod-security-admission is licensed under the Apache License, Version 2.0.
+
 [releases]: https://github.com/cybozu-go/pod-security-admission/releases
