@@ -22,7 +22,6 @@ jobs:
         with:
           path: |
             bin
-            testbin
           key: cache-${{ env.cache-version }}-go-${{ env.go-version }}-${{ hashFiles('Makefile') }}
       - run: make setup
         if: steps.cache-tools.outputs.cache-hit != 'true'
