@@ -70,8 +70,8 @@ var _ = BeforeSuite(func() {
 				filepath.Join("testdata", "config"),
 			},
 		},
-		KubeAPIServerFlags: append(envtest.DefaultKubeAPIServerFlags, "--feature-gates=ProcMountType=true"),
 	}
+	testEnv.ControlPlane.GetAPIServer().Configure().Append("feature-gates", "ProcMountType=true")
 
 	cfg, err := testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
