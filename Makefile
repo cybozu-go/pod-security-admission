@@ -1,6 +1,6 @@
-CONTROLLER_RUNTIME_VERSION := $(shell awk '/sigs\.k8s\.io\/controller-runtime/ {print substr($$2, 2)}' go.mod)
-CONTROLLER_TOOLS_VERSION = 0.5.0
-KUSTOMIZE_VERSION = 3.8.7
+CONTROLLER_TOOLS_VERSION = 0.6.2
+KUSTOMIZE_VERSION = 4.3.0
+ENVTEST_K8S_VERSION = 1.21.4
 
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash
@@ -12,6 +12,7 @@ KUSTOMIZE = $(BIN_DIR)/kustomize
 CONTROLLER_GEN = $(BIN_DIR)/controller-gen
 STATICCHECK = $(BIN_DIR)/staticcheck
 NILERR = $(BIN_DIR)/nilerr
+SETUP_ENVTEST = $(BIN_DIR)/setup-envtest
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -61,13 +62,10 @@ lint: $(STATICCHECK) $(NILERR)
 	$(STATICCHECK) ./...
 	go vet ./...
 
-ENVTEST_ASSETS_DIR=$(shell pwd)/testbin
 .PHONY: test
 test: manifests generate ## Run tests.
 	{ \
-	source ${ENVTEST_ASSETS_DIR}/setup-envtest.sh && \
-	fetch_envtest_tools $(ENVTEST_ASSETS_DIR) && \
-	setup_envtest_env $(ENVTEST_ASSETS_DIR) && \
+	source <($(SETUP_ENVTEST) use -p env $(ENVTEST_K8S_VERSION)) && \
 	go test -v -count=1 ./... -coverprofile cover.out ; \
 	}
 
@@ -94,14 +92,15 @@ $(STATICCHECK):
 $(NILERR):
 	$(call go-install-tool,$(NILERR),github.com/gostaticanalysis/nilerr/cmd/nilerr@latest)
 
+$(SETUP_ENVTEST):
+	$(call go-install-tool,$(SETUP_ENVTEST),sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
+
 .PHONY: setup
-setup: $(STATICCHECK) $(NILERR) $(KUSTOMIZE) $(CONTROLLER_GEN)
-	mkdir -p ${ENVTEST_ASSETS_DIR}
-	curl -sSLo ${ENVTEST_ASSETS_DIR}/setup-envtest.sh https://raw.githubusercontent.com/kubernetes-sigs/controller-runtime/v$(CONTROLLER_RUNTIME_VERSION)/hack/setup-envtest.sh
+setup: $(STATICCHECK) $(NILERR) $(KUSTOMIZE) $(CONTROLLER_GEN) $(SETUP_ENVTEST)
 
 .PHONY: clean
 clean:
-	rm -rf bin testbin
+	rm -rf bin
 	rm -f config/crd/bases/*
 
 # go-install-tool will 'go install' any package $2 and install it to $1.
