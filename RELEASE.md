@@ -46,12 +46,14 @@ Bump version
     $ git neco review
     ```
 1. Merge this branch.
-1. Checkout `main` branch.
-1. Add a git tag, then push it.
+1. Add a git tag to the main HEAD, then push it.
 
     ```console
-    $ git tag "v$VERSION"
+    $ git checkout main
+    $ git pull
+    $ git tag -a -m "Release v$VERSION" "v$VERSION"
     $ git push origin "v$VERSION"
+    ```
 
 Now the version is bumped up and the latest container image is uploaded to [quay.io](https://quay.io/cybozu/pod-security-admission).
 
