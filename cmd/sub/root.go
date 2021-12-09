@@ -10,7 +10,7 @@ import (
 	psa "github.com/cybozu-go/pod-security-admission"
 	"github.com/cybozu-go/pod-security-admission/hooks"
 	"github.com/spf13/cobra"
-	"k8s.io/klog"
+	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 	"sigs.k8s.io/yaml"
 )
