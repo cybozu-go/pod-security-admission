@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.3] - 2021-12-10
+
+### Changed
+
+- update supported k8s version to 1.22 (#19)
+
 ## [0.2.2] - 2021-09-17
 
 ### Changed
@@ -27,7 +33,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 This is the first release.
 
-[Unreleased]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.2...HEAD
+[Unreleased]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.3...HEAD
+[0.2.3]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.1...v0.2.2
 [0.2.1]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.0...v0.2.1
 [0.2.0]: https://github.com/cybozu-go/pod-security-admission/compare/v0.1.0...v0.2.0
