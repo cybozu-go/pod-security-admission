@@ -3,7 +3,7 @@ resources:
 
 images:
 - name: pod-security-admission
-  newTag: 0.2.2
+  newTag: 0.2.3
   newName: quay.io/cybozu/pod-security-admission
 
 generatorOptions:
