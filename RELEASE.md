@@ -37,12 +37,12 @@ Bump version
 
     ```console
     # Set VERSION and confirm it. It should not have "v" prefix.
-    $ VERSION=x.y.x
+    $ VERSION=x.y.z
     $ echo $VERSION
     ```
 
 1. Checkout `main` branch.
-1. Make a branch to release, for example by `git neco dev "$VERSION"`
+1. Make a branch to release, for example by `git neco dev "bump-$VERSION"`
 1. Edit `CHANGELOG.md` for the new version ([example][]).
 1. Edit `version.go` for the new version.
 1. Edit `config/manager/kustomization.yaml` and update newTag value for the new version.
@@ -57,7 +57,7 @@ Bump version
 
     ```console
     # Set VERSION again.
-    $ VERSION=x.y.x
+    $ VERSION=x.y.z
     $ echo $VERSION
 
     $ git checkout main
