@@ -73,7 +73,7 @@ test: manifests generate ## Run tests.
 
 .PHONY: build
 build: ## Build binary.
-	CGO_ENABLED=0 go build -o bin/pod-security-admission -ldflags="-w -s" main.go
+	CGO_ENABLED=0 go build -o bin/pod-security-admission -ldflags="-w -s" ./cmd
 
 $(INSTALL_YAML): $(KUSTOMIZE)
 	mkdir -p build
