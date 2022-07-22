@@ -26,6 +26,7 @@ jobs:
       - run: make setup
         if: steps.cache-tools.outputs.cache-hit != 'true'
       - run: make lint
+      - run: make check-generate
       - run: make test
   build-image:
     name: Build Container Image
