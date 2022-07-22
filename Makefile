@@ -1,6 +1,6 @@
-CONTROLLER_TOOLS_VERSION = 0.7.0
-KUSTOMIZE_VERSION = 4.4.1
-ENVTEST_K8S_VERSION = 1.22.1
+CONTROLLER_TOOLS_VERSION = 0.9.2
+KUSTOMIZE_VERSION = 4.5.5
+ENVTEST_K8S_VERSION = 1.24.2
 
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash
@@ -11,7 +11,6 @@ INSTALL_YAML = build/install.yaml
 KUSTOMIZE = $(BIN_DIR)/kustomize
 CONTROLLER_GEN = $(BIN_DIR)/controller-gen
 STATICCHECK = $(BIN_DIR)/staticcheck
-NILERR = $(BIN_DIR)/nilerr
 SETUP_ENVTEST = $(BIN_DIR)/setup-envtest
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
@@ -57,7 +56,7 @@ check-generate:
 	git diff --exit-code --name-only
 
 .PHONY: lint
-lint: $(STATICCHECK) $(NILERR)
+lint: $(STATICCHECK)
 	test -z "$$(gofmt -s -l . | tee /dev/stderr)"
 	$(STATICCHECK) ./...
 	go vet ./...
@@ -73,7 +72,7 @@ test: manifests generate ## Run tests.
 
 .PHONY: build
 build: ## Build binary.
-	CGO_ENABLED=0 go build -o bin/pod-security-admission -ldflags="-w -s" main.go
+	CGO_ENABLED=0 go build -o bin/pod-security-admission -ldflags="-w -s" ./cmd
 
 $(INSTALL_YAML): $(KUSTOMIZE)
 	mkdir -p build
@@ -89,14 +88,11 @@ $(KUSTOMIZE): ## Download kustomize locally if necessary.
 $(STATICCHECK):
 	$(call go-install-tool,$(STATICCHECK),honnef.co/go/tools/cmd/staticcheck@latest)
 
-$(NILERR):
-	$(call go-install-tool,$(NILERR),github.com/gostaticanalysis/nilerr/cmd/nilerr@latest)
-
 $(SETUP_ENVTEST):
 	$(call go-install-tool,$(SETUP_ENVTEST),sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
 
 .PHONY: setup
-setup: $(STATICCHECK) $(NILERR) $(KUSTOMIZE) $(CONTROLLER_GEN) $(SETUP_ENVTEST)
+setup: $(STATICCHECK) $(KUSTOMIZE) $(CONTROLLER_GEN) $(SETUP_ENVTEST)
 
 .PHONY: clean
 clean:
