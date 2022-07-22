@@ -12,7 +12,7 @@ jobs:
     name: Push Container Image
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: docker build -t quay.io/cybozu/pod-security-admission:latest .
       - name: Push docker image to Quay.io
         run: |
@@ -30,7 +30,7 @@ jobs:
     container:
       image: quay.io/cybozu/golang:1.17-focal
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - run: make build/install.yaml
       - name: Create release
         run: |
