@@ -37,5 +37,16 @@ func (v DenyUnsafeProcMount) Validate(ctx context.Context, pod *corev1.Pod) fiel
 		}
 	}
 
+	pp = p.Child("ephemeralContainers")
+	for i, co := range pod.Spec.EphemeralContainers {
+		if co.SecurityContext == nil || co.SecurityContext.ProcMount == nil {
+			continue
+		}
+		proc := *co.SecurityContext.ProcMount
+		if proc != corev1.DefaultProcMount {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "procMount"), fmt.Sprintf("ProcMountType %s is not allowed", proc)))
+		}
+	}
+
 	return errs
 }

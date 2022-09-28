@@ -48,5 +48,15 @@ func (v DenyRootGroups) Validate(ctx context.Context, pod *corev1.Pod) field.Err
 			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "runAsGroup"), "Running with the root GID is forbidden"))
 		}
 	}
+
+	pp = p.Child("ephemeralContainers")
+	for i, co := range pod.Spec.EphemeralContainers {
+		if co.SecurityContext == nil {
+			continue
+		}
+		if co.SecurityContext.RunAsGroup != nil && *co.SecurityContext.RunAsGroup == 0 {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "runAsGroup"), "Running with the root GID is forbidden"))
+		}
+	}
 	return errs
 }

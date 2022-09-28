@@ -22,6 +22,14 @@ webhooks:
           - CREATE
         resources:
           - pods
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - UPDATE
+        resources:
+          - pods/ephemeralcontainers
     sideEffects: None
     namespaceSelector:
       matchExpressions:
@@ -54,6 +62,14 @@ webhooks:
           - CREATE
         resources:
           - pods
+      - apiGroups:
+          - ""
+        apiVersions:
+          - v1
+        operations:
+          - UPDATE
+        resources:
+          - pods/ephemeralcontainers
     sideEffects: None
     namespaceSelector:
       matchExpressions:

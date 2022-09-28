@@ -32,5 +32,12 @@ func (v DenyUnsafeSELinux) Validate(ctx context.Context, pod *corev1.Pod) field.
 		}
 	}
 
+	pp = p.Child("ephemeralContainers")
+	for i, co := range pod.Spec.EphemeralContainers {
+		if co.SecurityContext != nil && co.SecurityContext.SELinuxOptions != nil {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "selinuxOptions"), "Setting custom SELinux options is not allowed"))
+		}
+	}
+
 	return errs
 }

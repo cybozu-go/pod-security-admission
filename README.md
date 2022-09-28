@@ -80,6 +80,18 @@ Documentation
 
 [docs](docs/) directory contains documents about designs and specifications.
 
+Limitations
+-----------
+
+The following webhooks do not work.
+- Validating Webhook to deny an ephemeral container from running as root user.
+- Mutating Webhook to force an ephemeral container to run as non-root user.
+
+This is because `kubectl debug` command can not specify a user to run ephemeral containers.
+
+We have to wait until the following Issue is completed:
+https://github.com/kubernetes/kubectl/issues/1108
+
 Docker images
 -------------
 

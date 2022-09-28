@@ -51,6 +51,23 @@ func (v DenyRunAsRoot) Validate(ctx context.Context, pod *corev1.Pod) field.Erro
 			errs = append(errs, err)
 		}
 	}
+
+	// runAsNonRoot of an ephemeral container will not be validated until the following issue is completed.
+	// https://github.com/kubernetes/kubectl/issues/1108
+	/*
+		pp = p.Child("ephemeralContainers")
+		for i, co := range pod.Spec.EphemeralContainers {
+			if co.SecurityContext == nil || (co.SecurityContext.RunAsNonRoot == nil && co.SecurityContext.RunAsUser == nil) {
+				allContainersAllowed = false
+				continue
+			}
+			if err := validateRunUser(pp.Index(i).Child("securityContext"), co.SecurityContext.RunAsNonRoot, co.SecurityContext.RunAsUser); err != nil {
+				allContainersAllowed = false
+				errs = append(errs, err)
+			}
+		}
+	*/
+
 	if allContainersAllowed {
 		return errs
 	}

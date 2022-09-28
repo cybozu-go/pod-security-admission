@@ -39,5 +39,15 @@ func (v DenyUnsafeSeccomp) Validate(ctx context.Context, pod *corev1.Pod) field.
 		}
 	}
 
+	pp = p.Child("ephemeralContainers")
+	for i, co := range pod.Spec.EphemeralContainers {
+		if co.SecurityContext == nil || co.SecurityContext.SeccompProfile == nil {
+			continue
+		}
+		if co.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", co.SecurityContext.SeccompProfile.Type)))
+		}
+	}
+
 	return errs
 }
