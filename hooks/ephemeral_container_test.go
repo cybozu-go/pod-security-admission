@@ -199,10 +199,10 @@ spec:
 					ret := &corev1.Pod{}
 					err = k8sClient.Get(testCtx, types.NamespacedName{Name: pod.GetName(), Namespace: pod.GetNamespace()}, ret)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(pod.Spec.EphemeralContainers).Should(HaveLen(1))
-					Expect(pod.Spec.EphemeralContainers[0].SecurityContext).ShouldNot(BeNil())
-					Expect(pod.Spec.EphemeralContainers[0].SecurityContext.RunAsNonRoot).ShouldNot(BeNil())
-					Expect(pod.Spec.EphemeralContainers[0].SecurityContext.RunAsNonRoot).ShouldNot(HaveValue(Equal(true)))
+					Expect(ret.Spec.EphemeralContainers).Should(HaveLen(1))
+					Expect(ret.Spec.EphemeralContainers[0].SecurityContext).ShouldNot(BeNil())
+					Expect(ret.Spec.EphemeralContainers[0].SecurityContext.RunAsNonRoot).ShouldNot(BeNil())
+					Expect(ret.Spec.EphemeralContainers[0].SecurityContext.RunAsNonRoot).ShouldNot(HaveValue(Equal(true)))
 				})
 			})
 	*/
