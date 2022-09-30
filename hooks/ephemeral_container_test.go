@@ -18,8 +18,9 @@ import (
 var _ = Describe("Admission Webhook for EphemeralContainer", func() {
 
 	unmasked := corev1.UnmaskedProcMount
-	DescribeTable("Validating Ephemeral Container", func(namespace, name string, ec corev1.EphemeralContainer, allowed bool, message string) {
-		podManifest := `apiVersion: v1
+	DescribeTable("Validating Ephemeral Container",
+		func(namespace, name string, ec corev1.EphemeralContainer, allowed bool, message string) {
+			podManifest := `apiVersion: v1
 kind: Pod
 metadata:
   namespace: %s
@@ -32,28 +33,28 @@ spec:
       runAsNonRoot: true
 `
 
-		pod := &corev1.Pod{}
-		d := yaml.NewYAMLOrJSONDecoder(strings.NewReader(fmt.Sprintf(podManifest, namespace, name)), 4096)
-		err := d.Decode(pod)
-		Expect(err).NotTo(HaveOccurred())
-		err = k8sClient.Create(testCtx, pod)
-		Expect(err).NotTo(HaveOccurred())
+			pod := &corev1.Pod{}
+			d := yaml.NewYAMLOrJSONDecoder(strings.NewReader(fmt.Sprintf(podManifest, namespace, name)), 4096)
+			err := d.Decode(pod)
+			Expect(err).NotTo(HaveOccurred())
+			err = k8sClient.Create(testCtx, pod)
+			Expect(err).NotTo(HaveOccurred())
 
-		k8s, err := kubernetes.NewForConfig(k8sConfig)
-		Expect(err).NotTo(HaveOccurred())
-		podClient := k8s.CoreV1().Pods(pod.Namespace)
-		pod.Spec.EphemeralContainers = append(pod.Spec.EphemeralContainers, ec)
+			k8s, err := kubernetes.NewForConfig(k8sConfig)
+			Expect(err).NotTo(HaveOccurred())
+			podClient := k8s.CoreV1().Pods(pod.Namespace)
+			pod.Spec.EphemeralContainers = append(pod.Spec.EphemeralContainers, ec)
 
-		_, err = podClient.UpdateEphemeralContainers(testCtx, pod.Name, pod, metav1.UpdateOptions{})
-		if allowed {
-			Expect(err).NotTo(HaveOccurred(), "pod: %v", pod)
-		} else {
-			Expect(err).To(HaveOccurred(), "pod: %v", pod)
-			statusErr := &k8serrors.StatusError{}
-			Expect(errors.As(err, &statusErr)).To(BeTrue())
-			Expect(statusErr.ErrStatus.Message).To(ContainSubstring(message))
-		}
-	},
+			_, err = podClient.UpdateEphemeralContainers(testCtx, pod.Name, pod, metav1.UpdateOptions{})
+			if allowed {
+				Expect(err).NotTo(HaveOccurred(), "pod: %v", pod)
+			} else {
+				Expect(err).To(HaveOccurred(), "pod: %v", pod)
+				statusErr := &k8serrors.StatusError{}
+				Expect(errors.As(err, &statusErr)).To(BeTrue())
+				Expect(statusErr.ErrStatus.Message).To(ContainSubstring(message))
+			}
+		},
 		Entry("Valid Ephemeral Container", "restricted", "test-simple-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
