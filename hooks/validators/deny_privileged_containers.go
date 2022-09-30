@@ -34,7 +34,7 @@ func (v DenyPrivilegedContainers) Validate(ctx context.Context, pod *corev1.Pod)
 		}
 	}
 
-	pp = p.Child("ephemeralContainer")
+	pp = p.Child("ephemeralContainers")
 	for i, co := range pod.Spec.EphemeralContainers {
 		if co.SecurityContext == nil || co.SecurityContext.Privileged == nil {
 			continue
