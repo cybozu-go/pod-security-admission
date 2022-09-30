@@ -83,11 +83,11 @@ Documentation
 Limitations
 -----------
 
-The following webhooks do not work.
-- Validating Webhook to deny an ephemeral container from running as root user.
-- Mutating Webhook to force an ephemeral container to run as non-root user.
+The behavior of the webhooks are restricted intentionally as follows:
+- Validating Webhook does not deny an ephemeral container from running as root user.
+- Mutating Webhook does not force an ephemeral container to run as non-root user.
 
-This is because `kubectl debug` command can not specify a user to run ephemeral containers.
+This is because `kubectl debug` command cannot specify a user to run ephemeral containers.
 
 We have to wait until the following Issue is completed:
 https://github.com/kubernetes/kubectl/issues/1108
