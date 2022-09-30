@@ -72,7 +72,7 @@ spec:
 					Privileged:   pointer.Bool(true),
 				},
 			},
-		}, false, "denied the request: spec.ephemeralContainer[0].securityContext.privileged: Forbidden: Privileged containers are not allowed"),
+		}, false, "denied the request: spec.ephemeralContainers[0].securityContext.privileged: Forbidden: Privileged containers are not allowed"),
 		Entry("AllowPrivilegeEscalation Ephemeral Container", "restricted", "test-allow-privilege-escalation-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
