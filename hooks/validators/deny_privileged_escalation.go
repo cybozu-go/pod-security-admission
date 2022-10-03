@@ -35,5 +35,16 @@ func (v DenyPrivilegeEscalation) Validate(ctx context.Context, pod *corev1.Pod) 
 			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "allowPrivilegeEscalation"), "Allowing privilege escalation for containers is not allowed"))
 		}
 	}
+
+	pp = p.Child("ephemeralContainers")
+	for i, co := range pod.Spec.EphemeralContainers {
+		if co.SecurityContext == nil || co.SecurityContext.AllowPrivilegeEscalation == nil {
+			continue
+		}
+		escalation := *co.SecurityContext.AllowPrivilegeEscalation
+		if escalation {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "allowPrivilegeEscalation"), "Allowing privilege escalation for containers is not allowed"))
+		}
+	}
 	return errs
 }

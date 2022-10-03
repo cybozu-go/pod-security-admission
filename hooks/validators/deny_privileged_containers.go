@@ -33,5 +33,15 @@ func (v DenyPrivilegedContainers) Validate(ctx context.Context, pod *corev1.Pod)
 			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "privileged"), "Privileged containers are not allowed"))
 		}
 	}
+
+	pp = p.Child("ephemeralContainers")
+	for i, co := range pod.Spec.EphemeralContainers {
+		if co.SecurityContext == nil || co.SecurityContext.Privileged == nil {
+			continue
+		}
+		if *co.SecurityContext.Privileged {
+			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "privileged"), "Privileged containers are not allowed"))
+		}
+	}
 	return errs
 }

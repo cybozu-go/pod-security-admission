@@ -21,6 +21,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	clientgoscheme "k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/envtest"
@@ -43,6 +44,7 @@ var (
 	mutatingValidatingWebhookPath   = "/validate-mutating"
 )
 
+var k8sConfig *rest.Config
 var k8sClient client.Client
 var testEnv *envtest.Environment
 var testCtx = context.Background()
@@ -70,9 +72,10 @@ var _ = BeforeSuite(func() {
 	}
 	testEnv.ControlPlane.GetAPIServer().Configure().Append("feature-gates", "ProcMountType=true")
 
-	cfg, err := testEnv.Start()
+	var err error
+	k8sConfig, err = testEnv.Start()
 	Expect(err).NotTo(HaveOccurred())
-	Expect(cfg).NotTo(BeNil())
+	Expect(k8sConfig).NotTo(BeNil())
 
 	scheme := runtime.NewScheme()
 	err = clientgoscheme.AddToScheme(scheme)
@@ -84,13 +87,13 @@ var _ = BeforeSuite(func() {
 
 	//+kubebuilder:scaffold:scheme
 
-	k8sClient, err = client.New(cfg, client.Options{Scheme: scheme})
+	k8sClient, err = client.New(k8sConfig, client.Options{Scheme: scheme})
 	Expect(err).NotTo(HaveOccurred())
 	Expect(k8sClient).NotTo(BeNil())
 
 	// start webhook server using Manager
 	webhookInstallOptions := &testEnv.WebhookInstallOptions
-	mgr, err := ctrl.NewManager(cfg, ctrl.Options{
+	mgr, err := ctrl.NewManager(k8sConfig, ctrl.Options{
 		Scheme:             scheme,
 		Host:               webhookInstallOptions.LocalServingHost,
 		Port:               webhookInstallOptions.LocalServingPort,

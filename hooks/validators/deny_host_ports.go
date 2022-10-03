@@ -62,5 +62,10 @@ func (v DenyHostPorts) Validate(ctx context.Context, pod *corev1.Pod) field.Erro
 			}
 		}
 	}
+
+	// NOTE:
+	// It is not necessary to validate ephemeral containers' port.
+	// Ports are not allowed for ephemeral containers.
+	// https://github.com/kubernetes/api/blob/be233f856791f6954ea04ab777edfa3d3627ea22/core/v1/types.go#L3723
 	return errs
 }

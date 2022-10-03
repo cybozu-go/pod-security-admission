@@ -71,5 +71,17 @@ func (v DenyUnsafeCapabilities) Validate(ctx context.Context, pod *corev1.Pod) f
 		}
 	}
 
+	pp = p.Child("ephemeralContainers")
+	for i, co := range pod.Spec.EphemeralContainers {
+		if co.SecurityContext == nil || co.SecurityContext.Capabilities == nil {
+			continue
+		}
+		for j, add := range co.SecurityContext.Capabilities.Add {
+			if _, ok := v.allowedCapabilities[string(add)]; !ok {
+				errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "capabilities", "add").Index(j), fmt.Sprintf("Adding capability %s is not allowed", add)))
+			}
+		}
+	}
+
 	return errs
 }
