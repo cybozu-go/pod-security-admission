@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.3.0] - 2022-10-06
+
+### Added
+
+- Support for Ephemeral Container (#25)
+
 ## [0.2.4] - 2022-07-25
 
 ### Changed
@@ -41,7 +47,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 This is the first release.
 
-[Unreleased]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.4...HEAD
+[Unreleased]: https://github.com/cybozu-go/pod-security-admission/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.2...v0.2.3
 [0.2.2]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.1...v0.2.2

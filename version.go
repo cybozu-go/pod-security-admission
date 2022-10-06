@@ -1,6 +1,6 @@
 package psa
 
-const version = "0.2.4"
+const version = "0.3.0"
 
 // Version returns the semantic versioning string of pod-security-admission.
 func Version() string {
