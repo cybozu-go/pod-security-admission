@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.4.0] - 2023-01-31
+
+### Added
+
+- Allow net.ipv4.ip_unprivileged_port_start (#27)
+
 ## [0.3.0] - 2022-10-06
 
 ### Added
@@ -47,7 +53,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 This is the first release.
 
-[Unreleased]: https://github.com/cybozu-go/pod-security-admission/compare/v0.3.0...HEAD
+[Unreleased]: https://github.com/cybozu-go/pod-security-admission/compare/v0.4.0...HEAD
+[0.4.0]: https://github.com/cybozu-go/pod-security-admission/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.4...v0.3.0
 [0.2.4]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.3...v0.2.4
 [0.2.3]: https://github.com/cybozu-go/pod-security-admission/compare/v0.2.2...v0.2.3
