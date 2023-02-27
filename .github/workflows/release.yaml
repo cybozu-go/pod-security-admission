@@ -4,13 +4,12 @@ on:
     tags:
     - 'v*'
 env:
-  go-version: 1.18
   tag: ${GITHUB_REF#refs/tags/v}
   prerelease: ${{ contains(github.ref, '-') }}
 jobs:
   image:
     name: Push Container Image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
       - run: docker build -t quay.io/cybozu/pod-security-admission:latest .
@@ -26,9 +25,9 @@ jobs:
   release:
     name: Release on GitHub
     needs: image
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     container:
-      image: quay.io/cybozu/golang:1.18-focal
+      image: quay.io/cybozu/golang:1.20-jammy
     steps:
       - uses: actions/checkout@v3
       - run: make build/install.yaml

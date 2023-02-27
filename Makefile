@@ -1,17 +1,16 @@
-CONTROLLER_TOOLS_VERSION = 0.9.2
-KUSTOMIZE_VERSION = 4.5.5
-ENVTEST_K8S_VERSION = 1.24.2
+CONTROLLER_TOOLS_VERSION = 0.11.3
+KUSTOMIZE_VERSION = 4.5.7
+ENVTEST_K8S_VERSION = 1.25.3
 
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash
 .SHELLFLAGS = -e -o pipefail -c
-BIN_DIR = ./bin
+BIN_DIR := $(shell pwd)/bin
 INSTALL_YAML = build/install.yaml
 
 KUSTOMIZE = $(BIN_DIR)/kustomize
 CONTROLLER_GEN = $(BIN_DIR)/controller-gen
 STATICCHECK = $(BIN_DIR)/staticcheck
-SETUP_ENVTEST = $(BIN_DIR)/setup-envtest
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
 ifeq (,$(shell go env GOBIN))
@@ -62,11 +61,9 @@ lint: $(STATICCHECK)
 	go vet ./...
 
 .PHONY: test
-test: manifests generate ## Run tests.
-	{ \
-	source <($(SETUP_ENVTEST) use -p env $(ENVTEST_K8S_VERSION)) && \
-	go test -v -count=1 ./... -coverprofile cover.out ; \
-	}
+test: setup-envtest manifests generate ## Run tests.
+	source <($(SETUP_ENVTEST) use -p env); \
+		go test -v -count 1 -race ./... -ginkgo.v -ginkgo.fail-fast
 
 ##@ Build
 
@@ -88,11 +85,14 @@ $(KUSTOMIZE): ## Download kustomize locally if necessary.
 $(STATICCHECK):
 	$(call go-install-tool,$(STATICCHECK),honnef.co/go/tools/cmd/staticcheck@latest)
 
-$(SETUP_ENVTEST):
-	$(call go-install-tool,$(SETUP_ENVTEST),sigs.k8s.io/controller-runtime/tools/setup-envtest@latest)
+SETUP_ENVTEST := $(BIN_DIR)/setup-envtest
+.PHONY: setup-envtest
+setup-envtest: ## Download setup-envtest locally if necessary
+	# see https://github.com/kubernetes-sigs/controller-runtime/tree/master/tools/setup-envtest
+	GOBIN=$(BIN_DIR) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
 
 .PHONY: setup
-setup: $(STATICCHECK) $(KUSTOMIZE) $(CONTROLLER_GEN) $(SETUP_ENVTEST)
+setup: $(STATICCHECK) $(KUSTOMIZE) $(CONTROLLER_GEN) setup-envtest
 
 .PHONY: clean
 clean:

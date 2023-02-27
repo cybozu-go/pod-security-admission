@@ -1,5 +1,5 @@
 # Build the manager binary
-FROM quay.io/cybozu/golang:1.18-focal as builder
+FROM quay.io/cybozu/golang:1.20-jammy as builder
 
 WORKDIR /workspace
 # Copy the Go Modules manifests
