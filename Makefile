@@ -1,6 +1,6 @@
 CONTROLLER_TOOLS_VERSION = 0.11.3
 KUSTOMIZE_VERSION = 4.5.7
-ENVTEST_K8S_VERSION = 1.25.8
+ENVTEST_K8S_VERSION = 1.25.0
 
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash
@@ -62,7 +62,7 @@ lint: $(STATICCHECK)
 
 .PHONY: test
 test: setup-envtest manifests generate ## Run tests.
-	source <($(SETUP_ENVTEST) use -p env); \
+	source <($(SETUP_ENVTEST) use $(ENVTEST_K8S_VERSION) -p env); \
 		go test -v -count 1 -race ./... -ginkgo.v -ginkgo.fail-fast
 
 ##@ Build
