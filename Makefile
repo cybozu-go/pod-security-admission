@@ -1,6 +1,5 @@
 CONTROLLER_TOOLS_VERSION = 0.11.3
 KUSTOMIZE_VERSION = 4.5.7
-ENVTEST_K8S_VERSION = 1.25.8
 
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash
