@@ -5,6 +5,12 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [0.6.1] - 2023-05-10
+
+### Changed
+
+- Update for Kubernetes 1.25.9 ([#33](https://github.com/cybozu-go/pod-security-admission/pull/33))
+
 ## [0.6.0] - 2023-03-31
 
 ### Changed
@@ -68,7 +74,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 This is the first release.
 
-[Unreleased]: https://github.com/cybozu-go/pod-security-admission/compare/v0.6.0...HEAD
+[Unreleased]: https://github.com/cybozu-go/pod-security-admission/compare/v0.6.1...HEAD
+[0.6.1]: https://github.com/cybozu-go/pod-security-admission/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/cybozu-go/pod-security-admission/compare/v0.5.0...v0.6.0
 [0.5.0]: https://github.com/cybozu-go/pod-security-admission/compare/v0.4.0...v0.5.0
 [0.4.0]: https://github.com/cybozu-go/pod-security-admission/compare/v0.3.0...v0.4.0
