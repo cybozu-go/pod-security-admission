@@ -2,38 +2,45 @@ name: Release
 on:
   push:
     tags:
-    - 'v*'
-env:
-  tag: ${GITHUB_REF#refs/tags/v}
-  prerelease: ${{ contains(github.ref, '-') }}
+      - 'v*'
 jobs:
-  image:
-    name: Push Container Image
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - run: docker build -t quay.io/cybozu/pod-security-admission:latest .
-      - name: Push docker image to Quay.io
-        run: |
-          echo ${{ secrets.QUAY_PASSWORD }} | docker login -u ${{ secrets.QUAY_USER }} --password-stdin quay.io
-          echo "pushing image ..."
-          docker tag quay.io/cybozu/pod-security-admission:latest quay.io/cybozu/pod-security-admission:${{ env.tag }}
-          docker push quay.io/cybozu/pod-security-admission:${{ env.tag }}
-          BRANCH=$(echo ${{ env.tag }} | cut -d "." -f 1-2)
-          docker tag quay.io/cybozu/pod-security-admission:latest quay.io/cybozu/pod-security-admission:$BRANCH
-          docker push quay.io/cybozu/pod-security-admission:$BRANCH
   release:
-    name: Release on GitHub
-    needs: image
     runs-on: ubuntu-22.04
-    container:
-      image: quay.io/cybozu/golang:1.20-jammy
     steps:
-      - uses: actions/checkout@v3
-      - run: make build/install.yaml
-      - name: Create release
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: GHCR Login
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: quay.io Login
+        uses: docker/login-action@v2
+        with:
+          registry: quay.io
+          username: ${{ secrets.QUAY_USER }}
+          password: ${{ secrets.QUAY_PASSWORD }}
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: go.mod
+      - uses: ./.github/actions/aqua
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set Tag
         run: |
-          if ${{ env.prerelease }}; then
-            PRERELEASE="-prerelease"
-          fi
-          ghr -t ${{ secrets.GITHUB_TOKEN }} -u cybozu-go -r pod-security-admission -n v${{ env.tag }} ${PRERELEASE} -b "See [CHANGELOG.md](./CHANGELOG.md) for details." v${{ env.tag }} ./build/
+          TAG=${GITHUB_REF#refs/tags/v}
+          sed -i "s/newTag: .*/newTag: $TAG/g" config/manager/kustomization.yaml
+          make install.yaml
+      - name: GoReleaser
+        uses: goreleaser/goreleaser-action@f82d6c1c344bcacabba2c841718984797f664a6b # v4.2.0
+        with:
+          version: latest
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,6 +1,6 @@
 package psa
 
-const version = "0.6.1"
+var version = "unset"
 
 // Version returns the semantic versioning string of pod-security-admission.
 func Version() string {
