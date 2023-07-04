@@ -1,4 +1,4 @@
-ENVTEST_K8S_VERSION = 1.25.0
+ENVTEST_K8S_VERSION = 1.27.1
 
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash

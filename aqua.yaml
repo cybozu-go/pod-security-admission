@@ -4,6 +4,6 @@ registries:
   - type: standard
     ref: v4.23.0 # renovate: depName=aquaproj/aqua-registry
 packages:
-  - name: kubernetes-sigs/kustomize@kustomize/v4.5.7
-  - name: kubernetes-sigs/controller-tools/controller-gen@v0.11.3
+  - name: kubernetes-sigs/kustomize@kustomize/v5.1.0
+  - name: kubernetes-sigs/controller-tools/controller-gen@v0.12.0
   - name: goreleaser/goreleaser@v1.19.1
