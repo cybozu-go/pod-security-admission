@@ -1,15 +1,11 @@
-CONTROLLER_TOOLS_VERSION = 0.11.3
-KUSTOMIZE_VERSION = 4.5.7
 ENVTEST_K8S_VERSION = 1.25.0
 
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash
 .SHELLFLAGS = -e -o pipefail -c
 BIN_DIR := $(shell pwd)/bin
-INSTALL_YAML = build/install.yaml
+INSTALL_YAML = install.yaml
 
-KUSTOMIZE = $(BIN_DIR)/kustomize
-CONTROLLER_GEN = $(BIN_DIR)/controller-gen
 STATICCHECK = $(BIN_DIR)/staticcheck
 
 # Get the currently used golang install path (in GOPATH/bin, unless GOBIN is set)
@@ -41,12 +37,12 @@ help: ## Display this help.
 ##@ Development
 
 .PHONY: manifests
-manifests: $(CONTROLLER_GEN) ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
-	$(CONTROLLER_GEN) rbac:roleName=pod-security-admission webhook paths="./..."
+manifests: setup ## Generate WebhookConfiguration, ClusterRole and CustomResourceDefinition objects.
+	controller-gen rbac:roleName=pod-security-admission webhook paths="./..."
 
 .PHONY: generate
-generate: $(CONTROLLER_GEN) ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
-	$(CONTROLLER_GEN) object:headerFile="hack/boilerplate.go.txt" paths="./..."
+generate: setup ## Generate code containing DeepCopy, DeepCopyInto, and DeepCopyObject method implementations.
+	controller-gen object:headerFile="hack/boilerplate.go.txt" paths="./..."
 
 .PHONY: check-generate
 check-generate:
@@ -71,16 +67,9 @@ test: setup-envtest manifests generate ## Run tests.
 build: ## Build binary.
 	CGO_ENABLED=0 go build -o bin/pod-security-admission -ldflags="-w -s" ./cmd
 
-$(INSTALL_YAML): $(KUSTOMIZE)
+$(INSTALL_YAML): setup
 	mkdir -p build
-	$(KUSTOMIZE) build ./config/default > $@
-
-$(CONTROLLER_GEN): ## Download controller-gen locally if necessary.
-	$(call go-install-tool,$(CONTROLLER_GEN),sigs.k8s.io/controller-tools/cmd/controller-gen@v$(CONTROLLER_TOOLS_VERSION))
-
-$(KUSTOMIZE): ## Download kustomize locally if necessary.
-	mkdir -p $(BIN_DIR)
-	curl -sSLf https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv$(KUSTOMIZE_VERSION)/kustomize_v$(KUSTOMIZE_VERSION)_linux_amd64.tar.gz | tar -xz -C $(BIN_DIR)
+	kustomize build ./config/default > $@
 
 $(STATICCHECK):
 	$(call go-install-tool,$(STATICCHECK),honnef.co/go/tools/cmd/staticcheck@latest)
@@ -92,7 +81,8 @@ setup-envtest: ## Download setup-envtest locally if necessary
 	GOBIN=$(BIN_DIR) go install sigs.k8s.io/controller-runtime/tools/setup-envtest@latest
 
 .PHONY: setup
-setup: $(STATICCHECK) $(KUSTOMIZE) $(CONTROLLER_GEN) setup-envtest
+setup:
+	aqua i -l
 
 .PHONY: clean
 clean:

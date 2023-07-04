@@ -1,0 +1,48 @@
+project_name: pod-security-admission
+dist: bin/
+builds:
+  - env:
+      - CGO_ENABLED=0
+    main: ./cmd
+    binary: pod-security-admission
+    goos:
+      - linux
+    goarch:
+      - amd64
+    ldflags:
+      - -X github.com/cybozu-go/pod-security-admission.Version={{.Version}}
+archives:
+  - files:
+      - install.yaml
+dockers:
+  - image_templates:
+    - "quay.io/cybozu/{{.ProjectName}}:{{ .Version }}-amd64"
+    - "ghcr.io/cybozu-go/{{.ProjectName}}:{{ .Version }}-amd64"
+    use: buildx
+    dockerfile: Dockerfile
+    extra_files:
+      - LICENSE
+    build_flag_templates:
+      - "--platform=linux/amd64"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+docker_manifests:
+  - name_template: "quay.io/cybozu/{{.ProjectName}}:{{ .Version }}"
+    image_templates:
+      - "quay.io/cybozu/{{.ProjectName}}:{{ .Version }}-amd64"
+  - name_template: "quay.io/cybozu/{{.ProjectName}}:{{ .Major }}.{{ .Minor }}"
+    image_templates:
+      - "quay.io/cybozu/{{.ProjectName}}:{{ .Version }}-amd64"
+  - name_template: "ghcr.io/cybozu-go/{{.ProjectName}}:{{ .Version }}"
+    image_templates:
+      - "ghcr.io/cybozu-go/{{.ProjectName}}:{{ .Version }}-amd64"
+  - name_template: "ghcr.io/cybozu-go/{{.ProjectName}}:{{ .Major }}.{{ .Minor }}"
+    image_templates:
+      - "ghcr.io/cybozu-go/{{.ProjectName}}:{{ .Version }}-amd64"
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Tag }}-next"
+changelog:
+  use: github-native

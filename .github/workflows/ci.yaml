@@ -13,14 +13,32 @@ jobs:
       - uses: actions/setup-go@v3
         with:
           go-version-file: go.mod
-          cache: true
-      - run: make setup
+      - uses: ./.github/actions/aqua
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
       - run: make lint
       - run: make check-generate
       - run: make test
-  build-image:
-    name: Build Container Image
+  dry-run:
+    name: Dry-run release
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
-      - run: docker build -t quay.io/cybozu/pod-security-admission:latest .
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: docker/setup-qemu-action@v2
+      - uses: docker/setup-buildx-action@v2
+      - name: Setup go
+        uses: actions/setup-go@v3
+        with:
+          go-version-file: go.mod
+      - uses: ./.github/actions/aqua
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - run: make install.yaml
+      - name: GoReleaser
+        uses: goreleaser/goreleaser-action@f82d6c1c344bcacabba2c841718984797f664a6b # v4.2.0
+        with:
+          version: latest
+          args: --snapshot --skip-publish --clean
