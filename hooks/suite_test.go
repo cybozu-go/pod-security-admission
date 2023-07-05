@@ -103,8 +103,7 @@ var _ = BeforeSuite(func() {
 	})
 	Expect(err).NotTo(HaveOccurred())
 
-	dec, err := admission.NewDecoder(scheme)
-	Expect(err).NotTo(HaveOccurred())
+	dec := admission.NewDecoder(scheme)
 	wh := mgr.GetWebhookServer()
 
 	baselineProfile := SecurityProfile{

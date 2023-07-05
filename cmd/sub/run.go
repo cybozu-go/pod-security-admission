@@ -41,7 +41,7 @@ func run(addr string, port int, profs []hooks.SecurityProfile) error {
 
 	// register webhook handlers
 	// admission.NewDecoder never returns non-nil error
-	dec, _ := admission.NewDecoder(scheme)
+	dec := admission.NewDecoder(scheme)
 	wh := mgr.GetWebhookServer()
 	for _, prof := range profs {
 		wh.Register("/mutate-"+prof.Name, hooks.NewPodMutator(mgr.GetClient(), ctrl.Log.WithName("mutate-"+prof.Name), dec, prof))
