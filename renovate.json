@@ -1,0 +1,48 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "username": "renovate[bot]",
+  "gitAuthor": "Renovate Bot <bot@renovateapp.com>",
+  "platform": "github",
+  "onboarding": false,
+  "repositories": [
+    "cybozu-go/pod-security-admission"
+  ],
+  "extends": [
+    "config:base",
+    "github>aquaproj/aqua-renovate-config#1.6.0",
+    ":semanticCommitTypeAll(chore)",
+    ":timezone(Asia/Tokyo)"
+  ],
+  "ignorePresets": [":prHourlyLimit2"],
+  "labels": [
+    "dependencies"
+  ],
+  "packageRules": [
+    {
+      "description": "Separate minor and patch updates for Kubernetes packages",
+      "matchDatasources": [
+        "go"
+      ],
+      "matchPackagePatterns": [
+        "^k8s\\.io\\/.*"
+      ],
+      "separateMinorPatch": true
+    },
+    {
+      "description": "Disable major updates for k8s.io/client-go",
+      "enabled": false,
+      "matchDatasources": [
+        "go"
+      ],
+      "matchPackageNames": [
+        "k8s.io/client-go"
+      ],
+      "matchUpdateTypes": [
+        "major"
+      ]
+    }
+  ],
+  "postUpdateOptions": [
+    "gomodTidy"
+  ]
+}
