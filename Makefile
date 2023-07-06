@@ -4,7 +4,6 @@ ENVTEST_K8S_VERSION = 1.27.1
 SHELL = /bin/bash
 .SHELLFLAGS = -e -o pipefail -c
 BIN_DIR := $(shell pwd)/bin
-INSTALL_YAML = install.yaml
 
 STATICCHECK = $(BIN_DIR)/staticcheck
 
@@ -66,10 +65,6 @@ test: setup-envtest manifests generate ## Run tests.
 .PHONY: build
 build: ## Build binary.
 	CGO_ENABLED=0 go build -o bin/pod-security-admission -ldflags="-w -s" ./cmd
-
-$(INSTALL_YAML): setup
-	mkdir -p build
-	kustomize build ./config/default > $@
 
 $(STATICCHECK):
 	$(call go-install-tool,$(STATICCHECK),honnef.co/go/tools/cmd/staticcheck@latest)

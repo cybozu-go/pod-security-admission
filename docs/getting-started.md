@@ -32,10 +32,8 @@ $ kubectl label namespace/cert-manager pod-security.cybozu.com/policy=privileged
 Deploy pod-security-admission:
 
 ```console
-$ wget https://github.com/cybozu-go/pod-security-admission/releases/download/vx.y.z/pod-security-admission_x.y.z_linux_amd64.tar.gz
-$ tar xvzf pod-security-admission_x.y.z_linux_amd64.tar.gz
-$ cd pod-security-admission_x.y.z_linux_amd64
-$ kubectl apply -f install.yaml
+$ helm repo add pod-security-admission https://cybozu-go.github.io/pod-security-admission
+$ helm template pod-security-admission pod-security-admission/pod-security-admission
 ```
 
 Verification

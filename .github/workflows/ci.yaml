@@ -36,7 +36,6 @@ jobs:
       - uses: ./.github/actions/aqua
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-      - run: make install.yaml
       - name: GoReleaser
         uses: goreleaser/goreleaser-action@f82d6c1c344bcacabba2c841718984797f664a6b # v4.2.0
         with:

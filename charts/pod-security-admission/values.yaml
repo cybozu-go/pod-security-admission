@@ -1,0 +1,32 @@
+controllerManager:
+  manager:
+    args:
+    - --cert-dir=/certs
+    - --config-path=/etc/pod-security-admission/config.yaml
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+    image:
+      repository: quay.io/cybozu/pod-security-admission
+      tag: app-version-placeholder
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        cpu: 100m
+        memory: 20Mi
+  replicas: 2
+kubernetesClusterDomain: cluster.local
+podSecurityAdmissionConfig:
+  configYaml: |-
+    - name: baseline
+      nonCoreVolumeTypes: true
+      allowPrivilegeEscalation: true
+      runAsRoot: true
+      rootGroups: true
+      seccomp: true
+    - name: restricted
+      forceRunAsNonRoot: true
+webhookService:
+  ports:
+  - port: 443
+    targetPort: 9443
+  type: ClusterIP
