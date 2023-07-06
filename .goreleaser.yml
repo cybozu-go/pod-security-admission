@@ -11,9 +11,6 @@ builds:
       - amd64
     ldflags:
       - -X github.com/cybozu-go/pod-security-admission.Version={{.Version}}
-archives:
-  - files:
-      - install.yaml
 dockers:
   - image_templates:
     - "quay.io/cybozu/{{.ProjectName}}:{{ .Version }}-amd64"
