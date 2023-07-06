@@ -1,0 +1,5 @@
+owner: cybozu-go
+git-repo: pod-security-admission
+release-name-template: "{{ .Name }}-chart-{{ .Version }}"
+make-release-latest: false
+release-notes-file: RELEASE.md
