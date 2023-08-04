@@ -4,7 +4,7 @@ import (
 	"context"
 
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 type ForceRunAsNonRoot struct{}
@@ -17,7 +17,7 @@ func (m ForceRunAsNonRoot) Mutate(ctx context.Context, pod *corev1.Pod) bool {
 			sc = &corev1.SecurityContext{}
 		}
 		if sc.RunAsNonRoot == nil && sc.RunAsUser == nil {
-			sc.RunAsNonRoot = pointer.Bool(true)
+			sc.RunAsNonRoot = ptr.To(true)
 			updated = true
 		}
 		pod.Spec.Containers[i].SecurityContext = sc
@@ -28,7 +28,7 @@ func (m ForceRunAsNonRoot) Mutate(ctx context.Context, pod *corev1.Pod) bool {
 			sc = &corev1.SecurityContext{}
 		}
 		if sc.RunAsNonRoot == nil && sc.RunAsUser == nil {
-			sc.RunAsNonRoot = pointer.Bool(true)
+			sc.RunAsNonRoot = ptr.To(true)
 			updated = true
 		}
 		pod.Spec.InitContainers[i].SecurityContext = sc
@@ -43,7 +43,7 @@ func (m ForceRunAsNonRoot) Mutate(ctx context.Context, pod *corev1.Pod) bool {
 				sc = &corev1.SecurityContext{}
 			}
 			if sc.RunAsNonRoot == nil && sc.RunAsUser == nil {
-				sc.RunAsNonRoot = pointer.Bool(true)
+				sc.RunAsNonRoot = ptr.To(true)
 				updated = true
 			}
 			pod.Spec.EphemeralContainers[i].SecurityContext = sc

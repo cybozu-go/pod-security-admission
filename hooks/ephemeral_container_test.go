@@ -12,7 +12,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/utils/pointer"
+	"k8s.io/utils/ptr"
 )
 
 var _ = Describe("Admission Webhook for EphemeralContainer", func() {
@@ -60,7 +60,7 @@ spec:
 				Name:  "debug",
 				Image: "quay.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
-					RunAsNonRoot: pointer.Bool(true),
+					RunAsNonRoot: ptr.To(true),
 				},
 			},
 		}, true, ""),
@@ -69,8 +69,8 @@ spec:
 				Name:  "debug",
 				Image: "quay.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
-					RunAsNonRoot: pointer.Bool(true),
-					Privileged:   pointer.Bool(true),
+					RunAsNonRoot: ptr.To(true),
+					Privileged:   ptr.To(true),
 				},
 			},
 		}, false, "denied the request: spec.ephemeralContainers[0].securityContext.privileged: Forbidden: Privileged containers are not allowed"),
@@ -79,8 +79,8 @@ spec:
 				Name:  "debug",
 				Image: "quay.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
-					RunAsNonRoot:             pointer.Bool(true),
-					AllowPrivilegeEscalation: pointer.Bool(true),
+					RunAsNonRoot:             ptr.To(true),
+					AllowPrivilegeEscalation: ptr.To(true),
 				},
 			},
 		}, false, "denied the request: spec.ephemeralContainers[0].securityContext.allowPrivilegeEscalation: Forbidden: Allowing privilege escalation for containers is not allowed"),
@@ -89,8 +89,8 @@ spec:
 				Name:  "debug",
 				Image: "quay.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
-					RunAsNonRoot: pointer.Bool(true),
-					RunAsGroup:   pointer.Int64(0),
+					RunAsNonRoot: ptr.To(true),
+					RunAsGroup:   ptr.To[int64](0),
 				},
 			},
 		}, false, "denied the request: spec.ephemeralContainers[0].securityContext.runAsGroup: Forbidden: Running with the root GID is forbidden"),
@@ -112,7 +112,7 @@ spec:
 				Name:  "debug",
 				Image: "quay.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
-					RunAsNonRoot: pointer.Bool(true),
+					RunAsNonRoot: ptr.To(true),
 					Capabilities: &corev1.Capabilities{
 						Add: []corev1.Capability{
 							"SYSLOG",
@@ -126,7 +126,7 @@ spec:
 				Name:  "debug",
 				Image: "quay.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
-					RunAsNonRoot: pointer.Bool(true),
+					RunAsNonRoot: ptr.To(true),
 					ProcMount:    &unmasked,
 				},
 			},
@@ -136,10 +136,10 @@ spec:
 				Name:  "debug",
 				Image: "quay.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
-					RunAsNonRoot: pointer.Bool(true),
+					RunAsNonRoot: ptr.To(true),
 					SeccompProfile: &corev1.SeccompProfile{
 						Type:             corev1.SeccompProfileTypeLocalhost,
-						LocalhostProfile: pointer.String("profiles/audit.json"),
+						LocalhostProfile: ptr.To("profiles/audit.json"),
 					},
 				},
 			},
@@ -149,7 +149,7 @@ spec:
 				Name:  "debug",
 				Image: "quay.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
-					RunAsNonRoot: pointer.Bool(true),
+					RunAsNonRoot: ptr.To(true),
 					SELinuxOptions: &corev1.SELinuxOptions{
 						Level: "s0:c123,c456",
 					},
