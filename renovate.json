@@ -9,7 +9,7 @@
   ],
   "extends": [
     "config:base",
-    "github>aquaproj/aqua-renovate-config#1.8.0",
+    "github>aquaproj/aqua-renovate-config#1.10.0",
     ":semanticCommitTypeAll(chore)",
     ":timezone(Asia/Tokyo)"
   ],
