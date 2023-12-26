@@ -7,9 +7,9 @@ require (
 	github.com/onsi/ginkgo/v2 v2.11.0
 	github.com/onsi/gomega v1.27.10
 	github.com/spf13/cobra v1.7.0
-	k8s.io/api v0.27.8
-	k8s.io/apimachinery v0.27.8
-	k8s.io/client-go v0.27.8
+	k8s.io/api v0.27.9
+	k8s.io/apimachinery v0.27.9
+	k8s.io/client-go v0.27.9
 	k8s.io/klog/v2 v2.100.1
 	k8s.io/utils v0.0.0-20231127182322-b307cd553661
 	sigs.k8s.io/controller-runtime v0.15.1
