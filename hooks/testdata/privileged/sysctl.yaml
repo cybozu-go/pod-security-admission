@@ -14,4 +14,4 @@ spec:
         value: "65536"
   containers:
     - name: ubuntu
-      image: quay.io/cybozu/ubuntu
+      image: ghcr.io/cybozu/ubuntu

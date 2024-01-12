@@ -13,7 +13,6 @@ builds:
       - -X github.com/cybozu-go/pod-security-admission.Version={{.Version}}
 dockers:
   - image_templates:
-    - "quay.io/cybozu/{{.ProjectName}}:{{ .Version }}-amd64"
     - "ghcr.io/cybozu-go/{{.ProjectName}}:{{ .Version }}-amd64"
     use: buildx
     dockerfile: Dockerfile
@@ -25,12 +24,6 @@ dockers:
       - "--label=org.opencontainers.image.revision={{.FullCommit}}"
       - "--label=org.opencontainers.image.version={{.Version}}"
 docker_manifests:
-  - name_template: "quay.io/cybozu/{{.ProjectName}}:{{ .Version }}"
-    image_templates:
-      - "quay.io/cybozu/{{.ProjectName}}:{{ .Version }}-amd64"
-  - name_template: "quay.io/cybozu/{{.ProjectName}}:{{ .Major }}.{{ .Minor }}"
-    image_templates:
-      - "quay.io/cybozu/{{.ProjectName}}:{{ .Version }}-amd64"
   - name_template: "ghcr.io/cybozu-go/{{.ProjectName}}:{{ .Version }}"
     image_templates:
       - "ghcr.io/cybozu-go/{{.ProjectName}}:{{ .Version }}-amd64"

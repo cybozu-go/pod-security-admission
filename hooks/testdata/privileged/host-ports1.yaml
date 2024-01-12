@@ -9,7 +9,7 @@ spec:
     runAsNonRoot: true
   containers:
     - name: ubuntu
-      image: quay.io/cybozu/ubuntu
+      image: ghcr.io/cybozu/ubuntu
       ports:
         - containerPort: 9090
         - containerPort: 8080

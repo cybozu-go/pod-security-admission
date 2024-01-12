@@ -12,4 +12,4 @@ spec:
       localhostProfile: profiles/audit.json
   containers:
     - name: ubuntu
-      image: quay.io/cybozu/ubuntu
+      image: ghcr.io/cybozu/ubuntu

@@ -11,4 +11,4 @@ spec:
       level: "s0:c123,c456"
   containers:
     - name: ubuntu
-      image: quay.io/cybozu/ubuntu
+      image: ghcr.io/cybozu/ubuntu
