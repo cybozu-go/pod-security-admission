@@ -12,8 +12,8 @@ webhooks:
   - v1beta1
   clientConfig:
     service:
-      name: '{{ include "pod-security-admission.fullname" . }}-webhook-service'
-      namespace: '{{ .Release.Namespace }}'
+      name: {{ include "pod-security-admission.fullname" . }}-webhook-service
+      namespace: {{ .Release.Namespace }}
       path: /validate-baseline
   failurePolicy: Fail
   name: baseline.vpod.kb.io
@@ -46,8 +46,8 @@ webhooks:
   - v1beta1
   clientConfig:
     service:
-      name: '{{ include "pod-security-admission.fullname" . }}-webhook-service'
-      namespace: '{{ .Release.Namespace }}'
+      name: {{ include "pod-security-admission.fullname" . }}-webhook-service
+      namespace: {{ .Release.Namespace }}
       path: /validate-restricted
   failurePolicy: Fail
   name: restricted.vpod.kb.io
