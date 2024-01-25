@@ -7,4 +7,4 @@ spec:
     runAsNonRoot: true
   containers:
     - name: ubuntu
-      image: quay.io/cybozu/ubuntu
+      image: ghcr.io/cybozu/ubuntu

@@ -9,9 +9,9 @@ spec:
     runAsNonRoot: true
   containers:
     - name: ubuntu
-      image: quay.io/cybozu/ubuntu
+      image: ghcr.io/cybozu/ubuntu
   initContainers:
     - name: debug
-      image: quay.io/cybozu/ubuntu-debug
+      image: ghcr.io/cybozu/ubuntu-debug
       securityContext:
         privileged: true

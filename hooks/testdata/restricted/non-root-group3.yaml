@@ -8,4 +8,4 @@ spec:
     fsGroup: 1000
   containers:
     - name: ubuntu
-      image: quay.io/cybozu/ubuntu
+      image: ghcr.io/cybozu/ubuntu

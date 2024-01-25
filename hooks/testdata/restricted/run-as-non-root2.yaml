@@ -5,11 +5,11 @@ metadata:
 spec:
   containers:
     - name: ubuntu
-      image: quay.io/cybozu/ubuntu
+      image: ghcr.io/cybozu/ubuntu
       securityContext:
         runAsNonRoot: true
   initContainers:
     - name: debug
-      image: quay.io/cybozu/ubuntu-debug
+      image: ghcr.io/cybozu/ubuntu-debug
       securityContext:
         runAsUser: 1000

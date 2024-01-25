@@ -28,7 +28,7 @@ metadata:
 spec:
   containers:
   - name: ubuntu
-    image: quay.io/cybozu/ubuntu
+    image: ghcr.io/cybozu/ubuntu
     securityContext:
       runAsNonRoot: true
 `
@@ -58,7 +58,7 @@ spec:
 		Entry("Valid Ephemeral Container", "restricted", "test-simple-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
-				Image: "quay.io/cybozu/ubuntu-debug",
+				Image: "ghcr.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot: ptr.To(true),
 				},
@@ -67,7 +67,7 @@ spec:
 		Entry("Privileged Ephemeral Container", "baseline", "test-privileged-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
-				Image: "quay.io/cybozu/ubuntu-debug",
+				Image: "ghcr.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot: ptr.To(true),
 					Privileged:   ptr.To(true),
@@ -77,7 +77,7 @@ spec:
 		Entry("AllowPrivilegeEscalation Ephemeral Container", "restricted", "test-allow-privilege-escalation-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
-				Image: "quay.io/cybozu/ubuntu-debug",
+				Image: "ghcr.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot:             ptr.To(true),
 					AllowPrivilegeEscalation: ptr.To(true),
@@ -87,7 +87,7 @@ spec:
 		Entry("RootGroup Ephemeral Container", "restricted", "test-root-group-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
-				Image: "quay.io/cybozu/ubuntu-debug",
+				Image: "ghcr.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot: ptr.To(true),
 					RunAsGroup:   ptr.To[int64](0),
@@ -100,7 +100,7 @@ spec:
 			Entry("RunAsRoot Ephemeral Container", "restricted", "test-run-as-root-ec", corev1.EphemeralContainer{
 				EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 					Name:  "debug",
-					Image: "quay.io/cybozu/ubuntu-debug",
+					Image: "ghcr.io/cybozu/ubuntu-debug",
 					SecurityContext: &corev1.SecurityContext{
 						RunAsNonRoot: pointer.Bool(false),
 					},
@@ -110,7 +110,7 @@ spec:
 		Entry("UnsafeCapability Ephemeral Container", "restricted", "test-unsafe-capability-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
-				Image: "quay.io/cybozu/ubuntu-debug",
+				Image: "ghcr.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot: ptr.To(true),
 					Capabilities: &corev1.Capabilities{
@@ -124,7 +124,7 @@ spec:
 		Entry("UnsafeProcMount Ephemeral Container", "restricted", "test-unsafe-procmount-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
-				Image: "quay.io/cybozu/ubuntu-debug",
+				Image: "ghcr.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot: ptr.To(true),
 					ProcMount:    &unmasked,
@@ -134,7 +134,7 @@ spec:
 		Entry("UnsafeSeccomp Ephemeral Container", "restricted", "test-unsafe-seccomp-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
-				Image: "quay.io/cybozu/ubuntu-debug",
+				Image: "ghcr.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot: ptr.To(true),
 					SeccompProfile: &corev1.SeccompProfile{
@@ -147,7 +147,7 @@ spec:
 		Entry("UnsafeSELinux Ephemeral Container", "restricted", "test-unsafe-selinux-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
-				Image: "quay.io/cybozu/ubuntu-debug",
+				Image: "ghcr.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot: ptr.To(true),
 					SELinuxOptions: &corev1.SELinuxOptions{
@@ -171,7 +171,7 @@ spec:
 		spec:
 		  containers:
 		  - name: ubuntu
-		    image: quay.io/cybozu/ubuntu
+		    image: ghcr.io/cybozu/ubuntu
 		    securityContext:
 		      runAsNonRoot: true
 		`
@@ -189,7 +189,7 @@ spec:
 					ec := corev1.EphemeralContainer{
 						EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 							Name:  "debug",
-							Image: "quay.io/cybozu/ubuntu-debug",
+							Image: "ghcr.io/cybozu/ubuntu-debug",
 						},
 					}
 					pod.Spec.EphemeralContainers = append(pod.Spec.EphemeralContainers, ec)

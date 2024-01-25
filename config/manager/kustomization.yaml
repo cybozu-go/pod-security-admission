@@ -4,7 +4,7 @@ resources:
 images:
 - name: pod-security-admission
   newTag: 0.6.1
-  newName: quay.io/cybozu/pod-security-admission
+  newName: ghcr.io/cybozu-go/pod-security-admission
 
 generatorOptions:
   disableNameSuffixHash: true

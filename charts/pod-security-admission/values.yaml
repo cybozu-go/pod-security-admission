@@ -6,7 +6,7 @@ controllerManager:
     containerSecurityContext:
       allowPrivilegeEscalation: false
     image:
-      repository: quay.io/cybozu/pod-security-admission
+      repository: ghcr.io/cybozu-go/pod-security-admission
       tag: app-version-placeholder
     imagePullPolicy: IfNotPresent
     resources:

@@ -95,7 +95,7 @@ https://github.com/kubernetes/kubectl/issues/1108
 Docker images
 -------------
 
-Docker images are available on [Quay.io](https://quay.io/repository/cybozu/pod-security-admission)
+Docker images are available on [ghcr.io](https://github.com/cybozu-go/pod-security-admission/pkgs/container/pod-security-admission)
 
 License
 -------
