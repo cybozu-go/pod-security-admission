@@ -89,7 +89,7 @@ func (v *podValidator) Handle(ctx context.Context, req admission.Request) admiss
 	v.log.Info("validating pod", "name", namespacedName, "profile", v.profileName)
 
 	po := &corev1.Pod{}
-	err := v.decoder.Decode(req, po)
+	err := admission.Decoder.Decode(*v.decoder, req, po)
 	if err != nil {
 		v.log.Error(err, "failed to decode pod", "name", namespacedName, "profile", v.profileName)
 		return admission.Errored(http.StatusBadRequest, err)

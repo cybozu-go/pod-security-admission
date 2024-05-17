@@ -96,7 +96,7 @@ var _ = BeforeSuite(func() {
 	// start webhook server using Manager
 	webhookInstallOptions := &testEnv.WebhookInstallOptions
 	mgr, err := ctrl.NewManager(k8sConfig, ctrl.Options{
-		Scheme:             scheme,
+		Scheme: scheme,
 		WebhookServer: webhook.NewServer(webhook.Options{
 			Host:    webhookInstallOptions.LocalServingHost,
 			Port:    webhookInstallOptions.LocalServingPort,
@@ -129,8 +129,8 @@ var _ = BeforeSuite(func() {
 		AllowPrivilegeEscalation: true,
 		RunAsRoot:                true,
 	}
-	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(baselineValidatingWebhookPath), dec, baselineProfile))
-	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(baselineMutatingWebhookPath), dec, baselineProfile))
+	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(baselineValidatingWebhookPath), &dec, baselineProfile))
+	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(baselineMutatingWebhookPath), &dec, baselineProfile))
 
 	// "hostpath" profile = "baseline" profile + AllowedHostPaths
 	hostpathProfile := SecurityProfile{
@@ -155,21 +155,21 @@ var _ = BeforeSuite(func() {
 		AllowPrivilegeEscalation: true,
 		RunAsRoot:                true,
 	}
-	wh.Register(hostpathValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(hostpathValidatingWebhookPath), dec, hostpathProfile))
-	wh.Register(hostpathMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(hostpathMutatingWebhookPath), dec, hostpathProfile))
+	wh.Register(hostpathValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(hostpathValidatingWebhookPath), &dec, hostpathProfile))
+	wh.Register(hostpathMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(hostpathMutatingWebhookPath), &dec, hostpathProfile))
 
 	restrictedProfile := SecurityProfile{
 		Name: "restricted",
 	}
-	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(restrictedValidatingWebhookPath), dec, restrictedProfile))
-	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(restrictedMutatingWebhookPath), dec, restrictedProfile))
+	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(restrictedValidatingWebhookPath), &dec, restrictedProfile))
+	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(restrictedMutatingWebhookPath), &dec, restrictedProfile))
 
 	mutatingProfile := SecurityProfile{
 		Name:              "mutating",
 		ForceRunAsNonRoot: true,
 	}
-	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(mutatingValidatingWebhookPath), dec, mutatingProfile))
-	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(mutatingMutatingWebhookPath), dec, mutatingProfile))
+	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(mutatingValidatingWebhookPath), &dec, mutatingProfile))
+	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(mutatingMutatingWebhookPath), &dec, mutatingProfile))
 
 	//+kubebuilder:scaffold:webhook
 

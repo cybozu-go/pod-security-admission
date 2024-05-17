@@ -17,8 +17,8 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 	var errs field.ErrorList
 
 	for k, v := range pod.Annotations {
-		if strings.HasPrefix(k, corev1.AppArmorBetaContainerAnnotationKeyPrefix) &&
-			v != corev1.AppArmorBetaProfileRuntimeDefault {
+		if strings.HasPrefix(k, corev1.DeprecatedAppArmorBetaContainerAnnotationKeyPrefix) &&
+			v != corev1.DeprecatedAppArmorBetaProfileRuntimeDefault {
 			errs = append(errs, field.Forbidden(p.Key(k), fmt.Sprintf("%s is not an allowed AppArmor profile", v)))
 		}
 	}

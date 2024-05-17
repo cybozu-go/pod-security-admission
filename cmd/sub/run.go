@@ -8,9 +8,9 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
-	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
+	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
 var (
@@ -48,10 +48,11 @@ func run(addr string, port int, profs []hooks.SecurityProfile) error {
 	// register webhook handlers
 	// admission.NewDecoder never returns non-nil error
 	dec := admission.NewDecoder(scheme)
+
 	wh := mgr.GetWebhookServer()
 	for _, prof := range profs {
-		wh.Register("/mutate-"+prof.Name, hooks.NewPodMutator(mgr.GetClient(), ctrl.Log.WithName("mutate-"+prof.Name), dec, prof))
-		wh.Register("/validate-"+prof.Name, hooks.NewPodValidator(mgr.GetClient(), ctrl.Log.WithName("validate-"+prof.Name), dec, prof))
+		wh.Register("/mutate-"+prof.Name, hooks.NewPodMutator(mgr.GetClient(), ctrl.Log.WithName("mutate-"+prof.Name), &dec, prof))
+		wh.Register("/validate-"+prof.Name, hooks.NewPodValidator(mgr.GetClient(), ctrl.Log.WithName("validate-"+prof.Name), &dec, prof))
 	}
 
 	// +kubebuilder:scaffold:builder
