@@ -8,11 +8,11 @@ import (
 	"github.com/cybozu-go/pod-security-admission/hooks/mutators"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
-	"k8s.io/apimachinery/pkg/runtime"
 )
 
 type podMutator struct {
