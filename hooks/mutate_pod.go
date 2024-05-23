@@ -12,6 +12,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 type podMutator struct {
@@ -50,7 +51,7 @@ func (m *podMutator) Handle(ctx context.Context, req admission.Request) admissio
 	m.log.Info("mutating pod,", "name", namespacedName, "profile", m.profileName)
 
 	po := &corev1.Pod{}
-	err := admission.Decoder.Decode(*m.decoder, req, po)
+	err := admission.NewDecoder(runtime.NewScheme()).Decode(req, po)
 	if err != nil {
 		m.log.Error(err, "failed to decode pod", "name", namespacedName, "profile", m.profileName)
 		return admission.Errored(http.StatusBadRequest, err)
