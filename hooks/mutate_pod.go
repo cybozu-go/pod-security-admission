@@ -8,7 +8,6 @@ import (
 	"github.com/cybozu-go/pod-security-admission/hooks/mutators"
 	"github.com/go-logr/logr"
 	corev1 "k8s.io/api/core/v1"
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
@@ -18,13 +17,13 @@ import (
 type podMutator struct {
 	client      client.Client
 	log         logr.Logger
-	decoder     *admission.Decoder
+	decoder     admission.Decoder
 	profileName string
 	mutators    []mutators.Mutator
 }
 
 // NewPodMutator creates a webhook handler for Pod.
-func NewPodMutator(c client.Client, log logr.Logger, dec *admission.Decoder, prof SecurityProfile) http.Handler {
+func NewPodMutator(c client.Client, log logr.Logger, dec admission.Decoder, prof SecurityProfile) http.Handler {
 	m := &podMutator{
 		client:      c,
 		log:         log,
@@ -51,8 +50,7 @@ func (m *podMutator) Handle(ctx context.Context, req admission.Request) admissio
 	m.log.Info("mutating pod,", "name", namespacedName, "profile", m.profileName)
 
 	po := &corev1.Pod{}
-	d := admission.NewDecoder(runtime.NewScheme())
-	err:= d.Decode(req, po)
+	err:= m.decoder.Decode(req, po)
 	if err != nil {
 		m.log.Error(err, "failed to decode pod", "name", namespacedName, "profile", m.profileName)
 		return admission.Errored(http.StatusBadRequest, err)
