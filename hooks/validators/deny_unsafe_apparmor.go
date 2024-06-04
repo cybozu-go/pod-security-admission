@@ -23,7 +23,7 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 		}
 	}
 
-	p0 := field.NewPath("spec").Child("SecurityContext")
+	p = field.NewPath("spec").Child("SecurityContext")
 	hasPodAppArmorProfile := pod.Spec.SecurityContext != nil && pod.Spec.SecurityContext.AppArmorProfile != nil
 	if hasPodAppArmorProfile {
 		isTypeUnconfined := pod.Spec.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeUnconfined
@@ -31,11 +31,12 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 		isTypeLocalhost := pod.Spec.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
 		hasNotAllowedType := !(isTypeUnconfined || isTypeRuntimeDefault || isTypeLocalhost)
 		if hasNotAllowedType {
-			errs = append(errs, field.Forbidden(p0.Child("AppArmorProfile"), "not an allowed *** AppArmor *** profile"))
+			// errs = append(errs, field.Forbidden(p.Child("AppArmorProfile"), fmt.Sprintf("%v is not an allowed AppArmor profile", pod.Spec.SecurityContext.AppArmorProfile.Type)))
+			errs = append(errs, field.Forbidden(p, fmt.Sprintf("%v is not an allowed AppArmor profile", pod.Spec.SecurityContext.AppArmorProfile.Type)))
 		}
 	}
 
-	p1 := p.Child("containers")
+	p = p.Child("containers")
 	for i, co := range pod.Spec.Containers {
 		hasPodAppArmorProfile := co.SecurityContext != nil && co.SecurityContext.AppArmorProfile != nil
 		if hasPodAppArmorProfile {
@@ -44,12 +45,12 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 			isTypeLocalhost := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
 			hasNotAllowedType := !(isTypeUnconfined || isTypeRuntimeDefault || isTypeLocalhost)
 			if hasNotAllowedType {
-				errs = append(errs, field.Forbidden(p1.Index(i), fmt.Sprintf("%s not an allowed *** AppArmor *** profile", "any")))
+				errs = append(errs, field.Forbidden(p.Index(i), fmt.Sprintf("%v is not an allowed AppArmor profile", co.SecurityContext.AppArmorProfile.Type)))
 			}
 		}
 	}
 
-	p2 := p.Child("initContainers")
+	p = p.Child("initContainers")
 	for i, co := range pod.Spec.Containers {
 		hasPodAppArmorProfile := co.SecurityContext != nil && co.SecurityContext.AppArmorProfile != nil
 		if hasPodAppArmorProfile {
@@ -58,7 +59,7 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 			isTypeLocalhost := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
 			hasNotAllowedType := !(isTypeUnconfined || isTypeRuntimeDefault || isTypeLocalhost)
 			if hasNotAllowedType {
-				errs = append(errs, field.Forbidden(p2.Index(i), fmt.Sprintf("%s not an allowed *** AppArmor *** profile", "any")))
+				errs = append(errs, field.Forbidden(p.Index(i), fmt.Sprintf("%v is not an allowed AppArmor profile", co.SecurityContext.AppArmorProfile.Type)))
 			}
 		}
 	}
