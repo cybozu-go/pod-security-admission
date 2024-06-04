@@ -72,7 +72,7 @@ var _ = BeforeSuite(func() {
 			},
 		},
 	}
-	testEnv.ControlPlane.GetAPIServer().Configure().Append("feature-gates", "ProcMountType=true")
+	testEnv.ControlPlane.GetAPIServer().Configure().Append("feature-gates", "ProcMountType=true", "UserNamespacesSupport=true")
 
 	var err error
 	k8sConfig, err = testEnv.Start()

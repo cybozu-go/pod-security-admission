@@ -14,6 +14,11 @@ var allowedSysctls = map[string]struct{}{
 	"net.ipv4.tcp_syncookies":             {},
 	"net.ipv4.ping_group_range":           {},
 	"net.ipv4.ip_unprivileged_port_start": {},
+	"net.ipv4.ip_local_reserved_ports":    {}, // since Kubernetes 1.27
+	"net.ipv4.tcp_keepalive_time":         {}, // since Kubernetes 1.29
+	"net.ipv4.tcp_fin_timeout":            {}, // since Kubernetes 1.29
+	"net.ipv4.tcp_keepalive_intvl":        {}, // since Kubernetes 1.29
+	"net.ipv4.tcp_keepalive_probes":       {}, // since Kubernetes 1.29
 }
 
 // DenyUnsafeSysctls is a Validator that denies usage of unsafe sysctls

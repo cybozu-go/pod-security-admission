@@ -26,6 +26,7 @@ metadata:
   namespace: %s
   name: %s
 spec:
+  hostUsers: false
   containers:
   - name: ubuntu
     image: ghcr.io/cybozu/ubuntu
