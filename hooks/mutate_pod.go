@@ -50,7 +50,7 @@ func (m *podMutator) Handle(ctx context.Context, req admission.Request) admissio
 	m.log.Info("mutating pod,", "name", namespacedName, "profile", m.profileName)
 
 	po := &corev1.Pod{}
-	err:= m.decoder.Decode(req, po)
+	err := m.decoder.Decode(req, po)
 	if err != nil {
 		m.log.Error(err, "failed to decode pod", "name", namespacedName, "profile", m.profileName)
 		return admission.Errored(http.StatusBadRequest, err)
