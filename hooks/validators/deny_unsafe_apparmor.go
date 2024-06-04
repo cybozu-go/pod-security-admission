@@ -30,7 +30,7 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 		isTypeRuntimeDefault := pod.Spec.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeRuntimeDefault
 		isTypeLocalhost := pod.Spec.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
 		hasNotAllowedType := !(isTypeUnconfined || isTypeRuntimeDefault || isTypeLocalhost)
-		if  hasNotAllowedType {
+		if hasNotAllowedType {
 			errs = append(errs, field.Forbidden(p0.Child("AppArmorProfile"), "not an allowed *** AppArmor *** profile"))
 		}
 	}
@@ -39,12 +39,12 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 	for i, co := range pod.Spec.Containers {
 		hasPodAppArmorProfile := co.SecurityContext != nil && co.SecurityContext.AppArmorProfile != nil
 		if hasPodAppArmorProfile {
-		    isTypeUnconfined := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeUnconfined
+			isTypeUnconfined := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeUnconfined
 			isTypeRuntimeDefault := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeRuntimeDefault
 			isTypeLocalhost := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
 			hasNotAllowedType := !(isTypeUnconfined || isTypeRuntimeDefault || isTypeLocalhost)
-			if  hasNotAllowedType {
-				errs = append(errs, field.Forbidden( p1.Index(i), fmt.Sprintf("%s not an allowed *** AppArmor *** profile", "any" )))
+			if hasNotAllowedType {
+				errs = append(errs, field.Forbidden(p1.Index(i), fmt.Sprintf("%s not an allowed *** AppArmor *** profile", "any")))
 			}
 		}
 	}
@@ -57,8 +57,8 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 			isTypeRuntimeDefault := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeRuntimeDefault
 			isTypeLocalhost := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
 			hasNotAllowedType := !(isTypeUnconfined || isTypeRuntimeDefault || isTypeLocalhost)
-			if  hasNotAllowedType {
-				errs = append(errs, field.Forbidden( p2.Index(i), fmt.Sprintf("%s not an allowed *** AppArmor *** profile", "any" )))
+			if hasNotAllowedType {
+				errs = append(errs, field.Forbidden(p2.Index(i), fmt.Sprintf("%s not an allowed *** AppArmor *** profile", "any")))
 			}
 		}
 	}
