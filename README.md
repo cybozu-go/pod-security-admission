@@ -12,7 +12,7 @@ This project is just a stopgap until it is replaced.
 Pod Security Admission
 ======================
 
-pod-security-admission is a set of [Kubernetes Admission Webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to ensure [Pod Security Standards](https://kubernetes.io/docs/concepts/security/pod-security-standards/).
+pod-security-admission is a set of [Kubernetes Admission Webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/) to ensure [Pod Security Standards v1.30](https://github.com/kubernetes/website/blob/snapshot-initial-v1.30/content/en/docs/concepts/security/pod-security-standards.md).
 
 pod-security-admission aims to be a simple [Pod Security Policy](https://kubernetes.io/docs/concepts/policy/pod-security-policy/) replacement.
 

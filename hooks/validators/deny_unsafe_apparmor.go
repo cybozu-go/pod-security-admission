@@ -26,12 +26,10 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 	p = field.NewPath("spec").Child("SecurityContext")
 	hasPodAppArmorProfile := pod.Spec.SecurityContext != nil && pod.Spec.SecurityContext.AppArmorProfile != nil
 	if hasPodAppArmorProfile {
-		isTypeUnconfined := pod.Spec.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeUnconfined
 		isTypeRuntimeDefault := pod.Spec.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeRuntimeDefault
 		isTypeLocalhost := pod.Spec.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
-		hasNotAllowedType := !(isTypeUnconfined || isTypeRuntimeDefault || isTypeLocalhost)
+		hasNotAllowedType := !(isTypeRuntimeDefault || isTypeLocalhost)
 		if hasNotAllowedType {
-			// errs = append(errs, field.Forbidden(p.Child("AppArmorProfile"), fmt.Sprintf("%v is not an allowed AppArmor profile", pod.Spec.SecurityContext.AppArmorProfile.Type)))
 			errs = append(errs, field.Forbidden(p, fmt.Sprintf("%v is not an allowed AppArmor profile", pod.Spec.SecurityContext.AppArmorProfile.Type)))
 		}
 	}
@@ -40,10 +38,9 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 	for i, co := range pod.Spec.Containers {
 		hasPodAppArmorProfile := co.SecurityContext != nil && co.SecurityContext.AppArmorProfile != nil
 		if hasPodAppArmorProfile {
-			isTypeUnconfined := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeUnconfined
 			isTypeRuntimeDefault := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeRuntimeDefault
 			isTypeLocalhost := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
-			hasNotAllowedType := !(isTypeUnconfined || isTypeRuntimeDefault || isTypeLocalhost)
+			hasNotAllowedType := !(isTypeRuntimeDefault || isTypeLocalhost)
 			if hasNotAllowedType {
 				errs = append(errs, field.Forbidden(p.Index(i), fmt.Sprintf("%v is not an allowed AppArmor profile", co.SecurityContext.AppArmorProfile.Type)))
 			}
@@ -54,10 +51,9 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 	for i, co := range pod.Spec.Containers {
 		hasPodAppArmorProfile := co.SecurityContext != nil && co.SecurityContext.AppArmorProfile != nil
 		if hasPodAppArmorProfile {
-			isTypeUnconfined := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeUnconfined
 			isTypeRuntimeDefault := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeRuntimeDefault
 			isTypeLocalhost := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
-			hasNotAllowedType := !(isTypeUnconfined || isTypeRuntimeDefault || isTypeLocalhost)
+			hasNotAllowedType := !(isTypeRuntimeDefault || isTypeLocalhost)
 			if hasNotAllowedType {
 				errs = append(errs, field.Forbidden(p.Index(i), fmt.Sprintf("%v is not an allowed AppArmor profile", co.SecurityContext.AppArmorProfile.Type)))
 			}

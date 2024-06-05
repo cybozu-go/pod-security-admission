@@ -52,7 +52,7 @@ func run(addr string, port int, profs []hooks.SecurityProfile) error {
 	wh := mgr.GetWebhookServer()
 	for _, prof := range profs {
 		wh.Register("/mutate-"+prof.Name, hooks.NewPodMutator(mgr.GetClient(), ctrl.Log.WithName("mutate-"+prof.Name), dec, prof))
-		wh.Register("/validate-"+prof.Name, hooks.NewPodValidator(mgr.GetClient(), ctrl.Log.WithName("validate-"+prof.Name), &dec, prof))
+		wh.Register("/validate-"+prof.Name, hooks.NewPodValidator(mgr.GetClient(), ctrl.Log.WithName("validate-"+prof.Name), dec, prof))
 	}
 
 	// +kubebuilder:scaffold:builder
