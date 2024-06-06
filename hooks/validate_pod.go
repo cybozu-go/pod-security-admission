@@ -17,13 +17,13 @@ import (
 type podValidator struct {
 	client      client.Client
 	log         logr.Logger
-	decoder     *admission.Decoder
+	decoder     admission.Decoder
 	profileName string
 	validators  []validators.Validator
 }
 
 // NewPodValidator creates a webhook handler for Pod.
-func NewPodValidator(c client.Client, log logr.Logger, dec *admission.Decoder, prof SecurityProfile) http.Handler {
+func NewPodValidator(c client.Client, log logr.Logger, dec admission.Decoder, prof SecurityProfile) http.Handler {
 	v := &podValidator{
 		client:      c,
 		log:         log,

@@ -44,21 +44,18 @@ var _ = Describe("validate Pod webhook", func() {
 		validatePod(filepath.Join("testdata", "baseline"), "privileged", true)
 		validatePod(filepath.Join("testdata", "restricted"), "privileged", true)
 	})
-
 	It("should deny privileged pods in hostpath namespace", func() {
 		validatePod(filepath.Join("testdata", "privileged"), "hostpath", false)
 		validatePod(filepath.Join("testdata", "hostpath"), "hostpath", true)
 		validatePod(filepath.Join("testdata", "baseline"), "hostpath", true)
 		validatePod(filepath.Join("testdata", "restricted"), "hostpath", true)
 	})
-
 	It("should deny privileged and hostpath pods in baseline namespace", func() {
 		validatePod(filepath.Join("testdata", "privileged"), "baseline", false)
 		validatePod(filepath.Join("testdata", "hostpath"), "baseline", false)
 		validatePod(filepath.Join("testdata", "baseline"), "baseline", true)
 		validatePod(filepath.Join("testdata", "restricted"), "baseline", true)
 	})
-
 	It("should deny privileged, hostpath, and baseline pods in restricted namespace", func() {
 		validatePod(filepath.Join("testdata", "privileged"), "restricted", false)
 		validatePod(filepath.Join("testdata", "hostpath"), "restricted", false)

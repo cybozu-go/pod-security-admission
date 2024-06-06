@@ -17,13 +17,13 @@ import (
 type podMutator struct {
 	client      client.Client
 	log         logr.Logger
-	decoder     *admission.Decoder
+	decoder     admission.Decoder
 	profileName string
 	mutators    []mutators.Mutator
 }
 
 // NewPodMutator creates a webhook handler for Pod.
-func NewPodMutator(c client.Client, log logr.Logger, dec *admission.Decoder, prof SecurityProfile) http.Handler {
+func NewPodMutator(c client.Client, log logr.Logger, dec admission.Decoder, prof SecurityProfile) http.Handler {
 	m := &podMutator{
 		client:      c,
 		log:         log,

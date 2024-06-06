@@ -5,6 +5,7 @@ metadata:
   annotations:
     test.pod-security.cybozu.com/message: "denied the request: spec.initContainers[0].securityContext.procMount: Forbidden: ProcMountType Unmasked is not allowed"
 spec:
+  hostUsers: false
   securityContext:
     runAsNonRoot: true
   containers:

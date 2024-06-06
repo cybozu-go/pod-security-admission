@@ -8,6 +8,8 @@ import (
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/healthz"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
+	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
+	"sigs.k8s.io/controller-runtime/pkg/webhook"
 	"sigs.k8s.io/controller-runtime/pkg/webhook/admission"
 )
 
@@ -26,13 +28,17 @@ func run(addr string, port int, profs []hooks.SecurityProfile) error {
 	ctrl.SetLogger(zap.New(zap.UseFlagOptions(&config.zapOpts)))
 
 	mgr, err := ctrl.NewManager(ctrl.GetConfigOrDie(), ctrl.Options{
-		Scheme:                 scheme,
-		MetricsBindAddress:     config.metricsAddr,
+		Scheme: scheme,
+		Metrics: metricsserver.Options{
+			BindAddress: config.metricsAddr,
+		},
 		HealthProbeBindAddress: config.probeAddr,
 		LeaderElection:         false,
-		Host:                   addr,
-		Port:                   port,
-		CertDir:                config.certDir,
+		WebhookServer: webhook.NewServer(webhook.Options{
+			Host:    addr,
+			Port:    port,
+			CertDir: config.certDir,
+		}),
 	})
 	if err != nil {
 		setupLog.Error(err, "unable to start manager")
@@ -42,6 +48,7 @@ func run(addr string, port int, profs []hooks.SecurityProfile) error {
 	// register webhook handlers
 	// admission.NewDecoder never returns non-nil error
 	dec := admission.NewDecoder(scheme)
+
 	wh := mgr.GetWebhookServer()
 	for _, prof := range profs {
 		wh.Register("/mutate-"+prof.Name, hooks.NewPodMutator(mgr.GetClient(), ctrl.Log.WithName("mutate-"+prof.Name), dec, prof))
