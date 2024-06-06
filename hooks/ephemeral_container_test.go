@@ -157,18 +157,18 @@ spec:
 				},
 			},
 		}, false, "denied the request: spec.ephemeralContainers[0].securityContext.selinuxOptions: Forbidden: Setting custom SELinux options is not allowed"),
-		Entry("AllowAppArmor Ephemeral Container", "restricted", "test-allowed-apparmor-ec", corev1.EphemeralContainer{
+		Entry("AllowAppArmor Ephemeral Container", "restricted", "test-unsafe-apparmor-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
 				Image: "ghcr.io/cybozu/ubuntu-debug",
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot: ptr.To(true),
 					AppArmorProfile: &corev1.AppArmorProfile{
-						Type: "RuntimeDefault",
+						Type: "Unconfined",
 					},
 				},
 			},
-		}, true, ""),
+		}, false, "denied the request: spec.SecurityContext.containers.initContainers.ephemeralContainers[0]: Forbidden: Unconfined is not an allowed AppArmor profile"),
 	)
 
 	// runAsNonRoot of an ephemeral container will not be mutated until the following issue is completed.

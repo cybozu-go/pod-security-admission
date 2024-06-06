@@ -48,7 +48,20 @@ func (v DenyUnsafeAppArmor) Validate(ctx context.Context, pod *corev1.Pod) field
 	}
 
 	p = p.Child("initContainers")
-	for i, co := range pod.Spec.Containers {
+	for i, co := range pod.Spec.InitContainers {
+		hasPodAppArmorProfile := co.SecurityContext != nil && co.SecurityContext.AppArmorProfile != nil
+		if hasPodAppArmorProfile {
+			isTypeRuntimeDefault := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeRuntimeDefault
+			isTypeLocalhost := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeLocalhost
+			hasNotAllowedType := !(isTypeRuntimeDefault || isTypeLocalhost)
+			if hasNotAllowedType {
+				errs = append(errs, field.Forbidden(p.Index(i), fmt.Sprintf("%v is not an allowed AppArmor profile", co.SecurityContext.AppArmorProfile.Type)))
+			}
+		}
+	}
+
+	p = p.Child("ephemeralContainers")
+	for i, co := range pod.Spec.EphemeralContainers {
 		hasPodAppArmorProfile := co.SecurityContext != nil && co.SecurityContext.AppArmorProfile != nil
 		if hasPodAppArmorProfile {
 			isTypeRuntimeDefault := co.SecurityContext.AppArmorProfile.Type == corev1.AppArmorProfileTypeRuntimeDefault
