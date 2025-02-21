@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-path6
+  annotations:
+    test.pod-security.cybozu.com/message: "denied the request: spec.volumes[0]: Forbidden: HostPath is allowed to be used only as read-only"
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
+      volumeMounts:
+        - mountPath: /mnt
+          name: host
+  volumes:
+    - name: host
+      hostPath:
+        path: /opt/bin

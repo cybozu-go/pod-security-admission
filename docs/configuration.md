@@ -32,9 +32,10 @@ SecurityProfile has these fields:
 
 #### AllowedHostPath
 
-| Name       | Type   | Description                   |
-| ---------- | ------ | ----------------------------- |
-| pathPrefix | string | The path prefix to be allowed |
+| Name       | Type   | Description                                                    |
+|------------|--------|----------------------------------------------------------------|
+| pathPrefix | string | The path prefix to be allowed                                  |
+| readOnly   | bool   | If `readOnly` is true, this path can only be mounted read-only |
 
 ### PortRange
 
