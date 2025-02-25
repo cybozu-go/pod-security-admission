@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: non-root-group2
+  annotations:
+    expected.pod-security.cybozu.com/baseline: ""
+    expected.pod-security.cybozu.com/hostpath: ""
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: ""
+spec:
+  securityContext:
+    runAsNonRoot: true
+    supplementalGroups:
+      - 1000
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu

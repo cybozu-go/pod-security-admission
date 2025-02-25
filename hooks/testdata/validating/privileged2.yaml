@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: privileged2
+  annotations:
+    expected.pod-security.cybozu.com/baseline: "denied the request: spec.initContainers[0].securityContext.privileged: Forbidden: Privileged containers are not allowed"
+    expected.pod-security.cybozu.com/hostpath: "denied the request: spec.initContainers[0].securityContext.privileged: Forbidden: Privileged containers are not allowed"
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.initContainers[0].securityContext.privileged: Forbidden: Privileged containers are not allowed"
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
+  initContainers:
+    - name: debug
+      image: ghcr.io/cybozu/ubuntu-debug
+      securityContext:
+        privileged: true
