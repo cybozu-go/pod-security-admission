@@ -143,6 +143,10 @@ var _ = BeforeSuite(func() {
 			{
 				PathPrefix: "/etc/hos", // not "host"
 			},
+			{
+				PathPrefix: "/opt/bin",
+				ReadOnly:   true,
+			},
 		},
 		AllowedHostPorts: []validators.PortRange{
 			{
