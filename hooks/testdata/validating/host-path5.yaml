@@ -1,0 +1,23 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-path5
+  annotations:
+    expected.pod-security.cybozu.com/baseline: "denied the request: spec.volumes[0]: Forbidden: HostPath is not allowed to be used"
+    expected.pod-security.cybozu.com/hostpath: ""
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.volumes[0]: Forbidden: HostPath is not allowed to be used"
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
+      volumeMounts:
+        - mountPath: /mnt
+          name: host
+          readOnly: true
+  volumes:
+    - name: host
+      hostPath:
+        path: /opt/bin
