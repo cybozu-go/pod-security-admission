@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: run-as-non-root-1
+  annotations:
+    expected.pod-security.cybozu.com/baseline: ""
+    expected.pod-security.cybozu.com/hostpath: ""
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: ""
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu

@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-network
+  annotations:
+    expected.pod-security.cybozu.com/baseline: "denied the request: spec.hostNetwork: Forbidden: Host network is not allowed to be used"
+    expected.pod-security.cybozu.com/hostpath: "denied the request: spec.hostNetwork: Forbidden: Host network is not allowed to be used"
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.hostNetwork: Forbidden: Host network is not allowed to be used"
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
+  hostNetwork: true

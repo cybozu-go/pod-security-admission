@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: default-capability
+  annotations:
+    expected.pod-security.cybozu.com/baseline: ""
+    expected.pod-security.cybozu.com/hostpath: ""
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: ""
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
+      securityContext:
+        capabilities:
+          add:
+            - CHOWN
+            - NET_BIND_SERVICE
+            - SETUID
+            - SYS_CHROOT

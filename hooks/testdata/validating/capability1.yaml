@@ -1,0 +1,24 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: capability1
+  annotations:
+    expected.pod-security.cybozu.com/baseline: "denied the request: spec.initContainers[0].securityContext.capabilities.add[0]: Forbidden: Adding capability SYS_ROOT is not allowed"
+    expected.pod-security.cybozu.com/hostpath: "denied the request: spec.initContainers[0].securityContext.capabilities.add[0]: Forbidden: Adding capability SYS_ROOT is not allowed"
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.initContainers[0].securityContext.capabilities.add[0]: Forbidden: Adding capability SYS_ROOT is not allowed"
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
+  initContainers:
+    - name: debug
+      image: ghcr.io/cybozu/ubuntu-debug
+      securityContext:
+        capabilities:
+          drop:
+            - ALL
+          add:
+            - SYS_ROOT

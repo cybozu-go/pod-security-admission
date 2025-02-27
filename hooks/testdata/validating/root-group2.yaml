@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: root-group2
+  annotations:
+    expected.pod-security.cybozu.com/baseline: ""
+    expected.pod-security.cybozu.com/hostpath: ""
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.securityContext.supplementalGroups[0]: Forbidden: Running with the supplementary GID is forbidden"
+spec:
+  securityContext:
+    runAsNonRoot: true
+    supplementalGroups:
+      - 0
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
