@@ -5,7 +5,7 @@ on:
       - 'v*'
 jobs:
   release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -38,7 +38,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   chart-release:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     needs: release
     if: contains(needs.release.result, 'success')
     steps:
@@ -81,7 +81,7 @@ jobs:
           git config user.name "$GITHUB_ACTOR"
           git config user.email "$GITHUB_ACTOR@users.noreply.github.com"
       - name: Run chart-release
-        uses: helm/chart-releaser-action@cae68fefc6b5f367a0275617c9f83181ba54714f # v1.7.0
+        uses: helm/chart-releaser-action@v1.7.0
         with:
           config: cr.yaml
         env:
