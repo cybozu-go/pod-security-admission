@@ -1,4 +1,4 @@
-ENVTEST_K8S_VERSION = 1.32.0
+ENVTEST_K8S_VERSION = 1.33.x
 
 # Set the shell used to bash for better error handling.
 SHELL = /bin/bash
@@ -77,7 +77,7 @@ setup-envtest: ## Download setup-envtest locally if necessary
 
 .PHONY: setup
 setup:
-	aqua i -l
+	aqua install --only-link
 
 .PHONY: clean
 clean:
