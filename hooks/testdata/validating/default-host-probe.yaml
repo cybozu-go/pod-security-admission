@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-probe-allowed
+  annotations:
+    expected.pod-security.cybozu.com/baseline: ""
+    expected.pod-security.cybozu.com/hostpath: ""
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: ""
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
+      livenessProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+      readinessProbe:
+        tcpSocket:
+          port: 8080
+      lifecycle:
+        preStop:
+          httpGet:
+            path: /shutdown
+            port: 8080
