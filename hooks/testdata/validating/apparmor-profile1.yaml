@@ -3,11 +3,10 @@ kind: Pod
 metadata:
   name: apparmorprofile1
   annotations:
-    container.apparmor.security.beta.kubernetes.io/initcontainer1: localhost/k8s-apparmor-example-deny-write
-    expected.pod-security.cybozu.com/baseline: "denied the request: spec.annotations[container.apparmor.security.beta.kubernetes.io/initcontainer1]: Forbidden: localhost/k8s-apparmor-example-deny-write is not an allowed AppArmor profile"
-    expected.pod-security.cybozu.com/hostpath: "denied the request: spec.annotations[container.apparmor.security.beta.kubernetes.io/initcontainer1]: Forbidden: localhost/k8s-apparmor-example-deny-write is not an allowed AppArmor profile"
+    expected.pod-security.cybozu.com/baseline: "denied the request: spec.SecurityContext.containers.initContainers[0]: Forbidden: Localhost/k8s-apparmor-example-deny-write is not an allowed AppArmor profile"
+    expected.pod-security.cybozu.com/hostpath: "denied the request: spec.SecurityContext.containers.initContainers[0]: Forbidden: Localhost/k8s-apparmor-example-deny-write is not an allowed AppArmor profile"
     expected.pod-security.cybozu.com/privileged: ""
-    expected.pod-security.cybozu.com/restricted: "denied the request: spec.annotations[container.apparmor.security.beta.kubernetes.io/initcontainer1]: Forbidden: localhost/k8s-apparmor-example-deny-write is not an allowed AppArmor profile"
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.SecurityContext.containers.initContainers[0]: Forbidden: Localhost/k8s-apparmor-example-deny-write is not an allowed AppArmor profile"
 spec:
   securityContext:
     runAsNonRoot: true
