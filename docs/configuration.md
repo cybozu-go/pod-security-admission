@@ -29,6 +29,7 @@ SecurityProfile has these fields:
 | forceRunAsNonRoot        | bool              | Force running with non-root users by MutatingWebhook                                                                                        |
 | rootGroups               | bool              | Allow running with a root primary or supplementary GID                                                                                      |
 | seccomp                  | bool              | Allow usage of non-default Seccomp profile                                                                                                  |
+| hostProbesAndLifecycle   | bool              | Allow setting `host` field in probes and lifecycle handlers                                                                                  |
 
 #### AllowedHostPath
 
