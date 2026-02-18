@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: host-lifecycle1
+  annotations:
+    expected.pod-security.cybozu.com/baseline: "denied the request: spec.containers[0].lifecycle.preStop.httpGet.host: Forbidden: Host is not allowed to be set"
+    expected.pod-security.cybozu.com/hostpath: "denied the request: spec.containers[0].lifecycle.preStop.httpGet.host: Forbidden: Host is not allowed to be set"
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.containers[0].lifecycle.preStop.httpGet.host: Forbidden: Host is not allowed to be set"
+spec:
+  securityContext:
+    runAsNonRoot: true
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
+      lifecycle:
+        preStop:
+          httpGet:
+            path: /shutdown
+            port: 8080
+            host: "example.com"

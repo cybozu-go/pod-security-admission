@@ -1,9 +1,8 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: default-apparmor
+  name: host-probe-allowed
   annotations:
-    "container.apparmor.security.beta.kubernetes.io/ubuntu": "runtime/default"
     expected.pod-security.cybozu.com/baseline: ""
     expected.pod-security.cybozu.com/hostpath: ""
     expected.pod-security.cybozu.com/privileged: ""
@@ -14,3 +13,15 @@ spec:
   containers:
     - name: ubuntu
       image: ghcr.io/cybozu/ubuntu
+      livenessProbe:
+        httpGet:
+          path: /healthz
+          port: 8080
+      readinessProbe:
+        tcpSocket:
+          port: 8080
+      lifecycle:
+        preStop:
+          httpGet:
+            path: /shutdown
+            port: 8080
