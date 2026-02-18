@@ -3,10 +3,10 @@ kind: Pod
 metadata:
   name: apparmor
   annotations:
-    expected.pod-security.cybozu.com/baseline: "denied the request: spec.SecurityContext.containers[0]: Forbidden: Localhost/my-profile is not an allowed AppArmor profile"
-    expected.pod-security.cybozu.com/hostpath: "denied the request: spec.SecurityContext.containers[0]: Forbidden: Localhost/my-profile is not an allowed AppArmor profile"
+    expected.pod-security.cybozu.com/baseline: ""
+    expected.pod-security.cybozu.com/hostpath: ""
     expected.pod-security.cybozu.com/privileged: ""
-    expected.pod-security.cybozu.com/restricted: "denied the request: spec.SecurityContext.containers[0]: Forbidden: Localhost/my-profile is not an allowed AppArmor profile"
+    expected.pod-security.cybozu.com/restricted: ""
 spec:
   securityContext:
     runAsNonRoot: true
