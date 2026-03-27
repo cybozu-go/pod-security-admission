@@ -125,7 +125,6 @@ var _ = BeforeSuite(func() {
 			},
 		},
 		RootGroups:               true,
-		Seccomp:                  true,
 		AllowPrivilegeEscalation: true,
 		RunAsRoot:                true,
 	}
@@ -155,7 +154,6 @@ var _ = BeforeSuite(func() {
 			},
 		},
 		RootGroups:               true,
-		Seccomp:                  true,
 		AllowPrivilegeEscalation: true,
 		RunAsRoot:                true,
 	}

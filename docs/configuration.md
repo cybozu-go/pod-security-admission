@@ -58,7 +58,6 @@ The profile describes only the allowed items. A false or no description indicate
   allowPrivilegeEscalation: true
   runAsRoot: true
   rootGroups: true
-  seccomp: true
 - name: restricted
   forceRunAsNonRoot: true
 ```
@@ -79,7 +78,6 @@ The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET
   allowPrivilegeEscalation: true
   rootGroups: true
   runAsRoot: true
-  seccomp: true
 - name: restricted
   forceRunAsNonRoot: true
 ```

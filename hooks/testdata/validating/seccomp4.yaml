@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: seccomp4
+  annotations:
+    expected.pod-security.cybozu.com/baseline: "denied the request: spec.securityContext.seccompProfile.type: Forbidden: Unconfined is not an allowed seccomp profile"
+    expected.pod-security.cybozu.com/hostpath: "denied the request: spec.securityContext.seccompProfile.type: Forbidden: Unconfined is not an allowed seccomp profile"
+    expected.pod-security.cybozu.com/privileged: ""
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.securityContext.seccompProfile.type: Forbidden: Unconfined is not an allowed seccomp profile"
+spec:
+  securityContext:
+    runAsNonRoot: true
+    seccompProfile:
+      type: "Unconfined"
+  containers:
+    - name: ubuntu
+      image: ghcr.io/cybozu/ubuntu
