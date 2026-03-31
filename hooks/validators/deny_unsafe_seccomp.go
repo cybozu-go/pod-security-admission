@@ -15,8 +15,10 @@ func (v DenyUnsafeSeccomp) Validate(ctx context.Context, pod *corev1.Pod) field.
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 
-	if pod.Spec.SecurityContext != nil && pod.Spec.SecurityContext.SeccompProfile != nil && pod.Spec.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
-		errs = append(errs, field.Forbidden(p.Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", pod.Spec.SecurityContext.SeccompProfile.Type)))
+	if pod.Spec.SecurityContext != nil && pod.Spec.SecurityContext.SeccompProfile != nil {
+		if !validSeccomp(pod.Spec.SecurityContext.SeccompProfile.Type) {
+			errs = append(errs, field.Forbidden(p.Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", pod.Spec.SecurityContext.SeccompProfile.Type)))
+		}
 	}
 
 	pp := p.Child("containers")
@@ -24,7 +26,7 @@ func (v DenyUnsafeSeccomp) Validate(ctx context.Context, pod *corev1.Pod) field.
 		if co.SecurityContext == nil || co.SecurityContext.SeccompProfile == nil {
 			continue
 		}
-		if co.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
+		if !validSeccomp(co.SecurityContext.SeccompProfile.Type) {
 			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", co.SecurityContext.SeccompProfile.Type)))
 		}
 	}
@@ -34,7 +36,7 @@ func (v DenyUnsafeSeccomp) Validate(ctx context.Context, pod *corev1.Pod) field.
 		if co.SecurityContext == nil || co.SecurityContext.SeccompProfile == nil {
 			continue
 		}
-		if co.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
+		if !validSeccomp(co.SecurityContext.SeccompProfile.Type) {
 			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", co.SecurityContext.SeccompProfile.Type)))
 		}
 	}
@@ -44,10 +46,15 @@ func (v DenyUnsafeSeccomp) Validate(ctx context.Context, pod *corev1.Pod) field.
 		if co.SecurityContext == nil || co.SecurityContext.SeccompProfile == nil {
 			continue
 		}
-		if co.SecurityContext.SeccompProfile.Type != corev1.SeccompProfileTypeRuntimeDefault {
+		if !validSeccomp(co.SecurityContext.SeccompProfile.Type) {
 			errs = append(errs, field.Forbidden(pp.Index(i).Child("securityContext", "seccompProfile", "type"), fmt.Sprintf("%s is not an allowed seccomp profile", co.SecurityContext.SeccompProfile.Type)))
 		}
 	}
 
 	return errs
+}
+
+func validSeccomp(t corev1.SeccompProfileType) bool {
+	return t == corev1.SeccompProfileTypeLocalhost ||
+		t == corev1.SeccompProfileTypeRuntimeDefault
 }

@@ -3,10 +3,10 @@ kind: Pod
 metadata:
   name: seccomp3
   annotations:
-    expected.pod-security.cybozu.com/baseline: ""
-    expected.pod-security.cybozu.com/hostpath: ""
+    expected.pod-security.cybozu.com/baseline: "denied the request: spec.initContainers[0].securityContext.seccompProfile.type: Forbidden: Unconfined is not an allowed seccomp profile"
+    expected.pod-security.cybozu.com/hostpath: "denied the request: spec.initContainers[0].securityContext.seccompProfile.type: Forbidden: Unconfined is not an allowed seccomp profile"
     expected.pod-security.cybozu.com/privileged: ""
-    expected.pod-security.cybozu.com/restricted: "denied the request: spec.initContainers[0].securityContext.seccompProfile.type: Forbidden: Localhost is not an allowed seccomp profile"
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.initContainers[0].securityContext.seccompProfile.type: Forbidden: Unconfined is not an allowed seccomp profile"
 spec:
   securityContext:
     runAsNonRoot: true
@@ -18,5 +18,4 @@ spec:
       image: ghcr.io/cybozu/ubuntu-debug
       securityContext:
         seccompProfile:
-          type: "Localhost"
-          localhostProfile: profiles/audit.json
+          type: "Unconfined"

@@ -139,12 +139,11 @@ spec:
 				SecurityContext: &corev1.SecurityContext{
 					RunAsNonRoot: ptr.To(true),
 					SeccompProfile: &corev1.SeccompProfile{
-						Type:             corev1.SeccompProfileTypeLocalhost,
-						LocalhostProfile: ptr.To("profiles/audit.json"),
+						Type: corev1.SeccompProfileTypeUnconfined,
 					},
 				},
 			},
-		}, false, "denied the request: spec.ephemeralContainers[0].securityContext.seccompProfile.type: Forbidden: Localhost is not an allowed seccomp profile"),
+		}, false, "denied the request: spec.ephemeralContainers[0].securityContext.seccompProfile.type: Forbidden: Unconfined is not an allowed seccomp profile"),
 		Entry("UnsafeSELinux Ephemeral Container", "restricted", "test-unsafe-selinux-ec", corev1.EphemeralContainer{
 			EphemeralContainerCommon: corev1.EphemeralContainerCommon{
 				Name:  "debug",
