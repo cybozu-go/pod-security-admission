@@ -3,6 +3,8 @@
 registries:
   - type: standard
     ref: v4.471.0 # renovate: depName=aquaproj/aqua-registry
+checksum:
+  enabled: true
 packages:
   - name: kubernetes-sigs/kustomize@kustomize/v5.8.1
   - name: kubernetes-sigs/controller-tools/controller-gen@v0.19.0
