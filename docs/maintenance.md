@@ -14,5 +14,13 @@ If Kubernetes or controller-runtime API has changed, please fix the relevant sou
 
 ## How to update dependencies
 
-Renovate will create PRs that update dependencies once a week.
-However, Kubernetes is only updated with patched versions.
+Dependencies are updated manually. Renovate is no longer used in this
+repository (the workflow was removed in #129 because it kept creating
+dependency dashboard issues).
+
+- Go modules: run `go get -u ./...` (or update specific modules) and
+  `go mod tidy`. Keep `k8s.io/*` and `sigs.k8s.io/controller-runtime` on
+  the versions that match the supported Kubernetes releases described above.
+- Tools managed by aqua: run `aqua update` and review the result, then run
+  `aqua update-checksum`.
+- GitHub Actions: update the pinned commit hashes in `.github/workflows/`.
