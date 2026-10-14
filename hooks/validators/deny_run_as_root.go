@@ -21,9 +21,22 @@ func validateRunUser(p *field.Path, runAsNonRoot *bool, runAsUser *int64) *field
 }
 
 // DenyRunAsRoot is a Validator that denies running as root users
-type DenyRunAsRoot struct{}
+type DenyRunAsRoot struct {
+	allowWithUserNamespace bool
+}
+
+// NewDenyRunAsRoot creates a DenyRunAsRoot.
+// If allowWithUserNamespace is true, pods that use user namespaces are allowed to run as root,
+// because root in a user namespace is not mapped to a privileged user on the host.
+func NewDenyRunAsRoot(allowWithUserNamespace bool) DenyRunAsRoot {
+	return DenyRunAsRoot{allowWithUserNamespace: allowWithUserNamespace}
+}
 
 func (v DenyRunAsRoot) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	if v.allowWithUserNamespace && usesUserNamespace(pod) {
+		return nil
+	}
+
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

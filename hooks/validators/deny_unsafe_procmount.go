@@ -9,9 +9,21 @@ import (
 )
 
 // DenyUnsafeProcMount is a Validator that denies unmasked proc mount
-type DenyUnsafeProcMount struct{}
+type DenyUnsafeProcMount struct {
+	allowWithUserNamespace bool
+}
+
+// NewDenyUnsafeProcMount creates a DenyUnsafeProcMount.
+// If allowWithUserNamespace is true, pods that use user namespaces are allowed to use unmasked proc mount.
+func NewDenyUnsafeProcMount(allowWithUserNamespace bool) DenyUnsafeProcMount {
+	return DenyUnsafeProcMount{allowWithUserNamespace: allowWithUserNamespace}
+}
 
 func (v DenyUnsafeProcMount) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
+	if v.allowWithUserNamespace && usesUserNamespace(pod) {
+		return nil
+	}
+
 	p := field.NewPath("spec")
 	var errs field.ErrorList
 

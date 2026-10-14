@@ -37,7 +37,7 @@ func NewPodMutator(c client.Client, log logr.Logger, dec admission.Decoder, prof
 func createMutators(prof SecurityProfile) []mutators.Mutator {
 	list := make([]mutators.Mutator, 0)
 	if prof.ForceRunAsNonRoot {
-		list = append(list, mutators.ForceRunAsNonRoot{})
+		list = append(list, mutators.NewForceRunAsNonRoot(prof.RunAsRootWithUserNamespace))
 	}
 	return list
 }

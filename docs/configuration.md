@@ -23,9 +23,11 @@ SecurityProfile has these fields:
 | appArmor                 | bool              | Allow overriding or disabling the default AppArmor profile                                                                                  |
 | seLinux                  | bool              | Allow setting custom SELinux options                                                                                                        |
 | procMount                | bool              | Allow unmasked proc mount                                                                                                                   |
+| procMountWithUserNamespace | bool            | Allow unmasked proc mount only for Pods that use user namespaces. If `procMount` is true, this field will be ignored.                      |
 | sysctls                  | bool              | Allow usage of unsafe sysctls                                                                                                               |
 | allowPrivilegeEscalation | bool              | Allow privilege escalation                                                                                                                  |
 | runAsRoot                | bool              | Allow running as root users                                                                                                                 |
+| runAsRootWithUserNamespace | bool            | Allow running as root users only for Pods that use user namespaces. If `runAsRoot` is true, this field will be ignored. If this is true, `forceRunAsNonRoot` does not mutate Pods that use user namespaces. |
 | forceRunAsNonRoot        | bool              | Force running with non-root users by MutatingWebhook                                                                                        |
 | rootGroups               | bool              | Allow running with a root primary or supplementary GID                                                                                      |
 | seccomp                  | bool              | Allow usage of non-default Seccomp profile                                                                                                  |
@@ -58,8 +60,10 @@ The profile describes only the allowed items. A false or no description indicate
   allowPrivilegeEscalation: true
   runAsRoot: true
   rootGroups: true
+  procMountWithUserNamespace: true
 - name: restricted
   forceRunAsNonRoot: true
+  runAsRootWithUserNamespace: true
 ```
 
 Administrators can customize the profile if needed.
@@ -78,9 +82,24 @@ The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET
   allowPrivilegeEscalation: true
   rootGroups: true
   runAsRoot: true
+  procMountWithUserNamespace: true
 - name: restricted
   forceRunAsNonRoot: true
+  runAsRootWithUserNamespace: true
 ```
+
+### User Namespaces
+
+Like the upstream [Pod Security Admission](https://kubernetes.io/docs/concepts/workloads/pods/user-namespaces/#integration-with-pod-security-admission-checks),
+some checks can be relaxed for Pods that use user namespaces (i.e., `spec.hostUsers` is `false`).
+Root inside a user namespace is never mapped to a privileged user on the host.
+
+- `runAsRootWithUserNamespace`: `runAsNonRoot` and `runAsUser` of the Pod and its containers are not checked.
+- `procMountWithUserNamespace`: `procMount` of containers is not checked.
+
+The default configuration follows the upstream behavior:
+`baseline` relaxes the `procMount` check (the `runAsRoot` check is already disabled), and
+`restricted` relaxes the `runAsNonRoot` and `runAsUser` checks.
 
 ### Webhook Configuration
 

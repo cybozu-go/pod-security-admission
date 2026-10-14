@@ -58,7 +58,7 @@ func createValidators(prof SecurityProfile) []validators.Validator {
 		list = append(list, validators.DenyUnsafeSELinux{})
 	}
 	if !prof.ProcMount {
-		list = append(list, validators.DenyUnsafeProcMount{})
+		list = append(list, validators.NewDenyUnsafeProcMount(prof.ProcMountWithUserNamespace))
 	}
 	if !prof.Sysctls {
 		list = append(list, validators.DenyUnsafeSysctls{})
@@ -70,7 +70,7 @@ func createValidators(prof SecurityProfile) []validators.Validator {
 		list = append(list, validators.DenyPrivilegeEscalation{})
 	}
 	if !prof.RunAsRoot {
-		list = append(list, validators.DenyRunAsRoot{})
+		list = append(list, validators.NewDenyRunAsRoot(prof.RunAsRootWithUserNamespace))
 	}
 	if !prof.RootGroups {
 		list = append(list, validators.DenyRootGroups{})
