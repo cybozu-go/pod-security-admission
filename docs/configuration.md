@@ -25,6 +25,7 @@ SecurityProfile has these fields:
 | procMount                | bool              | Allow unmasked proc mount                                                                                                                   |
 | procMountWithUserNamespace | bool            | Allow unmasked proc mount only for Pods that use user namespaces. If `procMount` is true, this field will be ignored.                      |
 | sysctls                  | bool              | Allow usage of unsafe sysctls                                                                                                               |
+| allowedSysctls           | []string          | The list of unsafe sysctls that can be used. If `sysctls` is true, this list will be ignored.                                               |
 | allowPrivilegeEscalation | bool              | Allow privilege escalation                                                                                                                  |
 | runAsRoot                | bool              | Allow running as root users                                                                                                                 |
 | runAsRootWithUserNamespace | bool            | Allow running as root users only for Pods that use user namespaces. If `runAsRoot` is true, this field will be ignored. If this is true, `forceRunAsNonRoot` does not mutate Pods that use user namespaces. |
@@ -67,7 +68,7 @@ The profile describes only the allowed items. A false or no description indicate
 ```
 
 Administrators can customize the profile if needed.
-The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET_ADMIN` capabilities, use of hostPorts from 1024 to 65535.
+The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET_ADMIN` capabilities, use of hostPorts from 1024 to 65535, and use of `net.core.somaxconn` sysctl.
 
 ```yaml
 - name: baseline
@@ -79,6 +80,8 @@ The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET
   allowedHostPorts:
     - min: 1024
       max: 65535
+  allowedSysctls:
+    - net.core.somaxconn
   allowPrivilegeEscalation: true
   rootGroups: true
   runAsRoot: true
