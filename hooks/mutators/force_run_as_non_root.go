@@ -7,9 +7,21 @@ import (
 	"k8s.io/utils/ptr"
 )
 
-type ForceRunAsNonRoot struct{}
+type ForceRunAsNonRoot struct {
+	skipUserNamespace bool
+}
+
+// NewForceRunAsNonRoot creates a ForceRunAsNonRoot.
+// If skipUserNamespace is true, pods that use user namespaces are not mutated.
+func NewForceRunAsNonRoot(skipUserNamespace bool) ForceRunAsNonRoot {
+	return ForceRunAsNonRoot{skipUserNamespace: skipUserNamespace}
+}
 
 func (m ForceRunAsNonRoot) Mutate(ctx context.Context, pod *corev1.Pod) bool {
+	if m.skipUserNamespace && pod.Spec.HostUsers != nil && !*pod.Spec.HostUsers {
+		return false
+	}
+
 	updated := false
 	for i, co := range pod.Spec.Containers {
 		sc := co.SecurityContext

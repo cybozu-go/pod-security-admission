@@ -22,8 +22,10 @@ podSecurityAdmissionConfig:
       allowPrivilegeEscalation: true
       runAsRoot: true
       rootGroups: true
+      procMountWithUserNamespace: true
     - name: restricted
       forceRunAsNonRoot: true
+      runAsRootWithUserNamespace: true
 webhookService:
   ports:
   - port: 443

@@ -124,9 +124,10 @@ var _ = BeforeSuite(func() {
 				Max: 65502,
 			},
 		},
-		RootGroups:               true,
-		AllowPrivilegeEscalation: true,
-		RunAsRoot:                true,
+		RootGroups:                 true,
+		AllowPrivilegeEscalation:   true,
+		RunAsRoot:                  true,
+		ProcMountWithUserNamespace: true,
 	}
 	wh.Register(baselineValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(baselineValidatingWebhookPath), dec, baselineProfile))
 	wh.Register(baselineMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(baselineMutatingWebhookPath), dec, baselineProfile))
@@ -153,22 +154,25 @@ var _ = BeforeSuite(func() {
 				Max: 65502,
 			},
 		},
-		RootGroups:               true,
-		AllowPrivilegeEscalation: true,
-		RunAsRoot:                true,
+		RootGroups:                 true,
+		AllowPrivilegeEscalation:   true,
+		RunAsRoot:                  true,
+		ProcMountWithUserNamespace: true,
 	}
 	wh.Register(hostpathValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(hostpathValidatingWebhookPath), dec, hostpathProfile))
 	wh.Register(hostpathMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(hostpathMutatingWebhookPath), dec, hostpathProfile))
 
 	restrictedProfile := SecurityProfile{
-		Name: "restricted",
+		Name:                       "restricted",
+		RunAsRootWithUserNamespace: true,
 	}
 	wh.Register(restrictedValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(restrictedValidatingWebhookPath), dec, restrictedProfile))
 	wh.Register(restrictedMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(restrictedMutatingWebhookPath), dec, restrictedProfile))
 
 	mutatingProfile := SecurityProfile{
-		Name:              "mutating",
-		ForceRunAsNonRoot: true,
+		Name:                       "mutating",
+		ForceRunAsNonRoot:          true,
+		RunAsRootWithUserNamespace: true,
 	}
 	wh.Register(mutatingValidatingWebhookPath, NewPodValidator(mgr.GetClient(), ctrl.Log.WithName(mutatingValidatingWebhookPath), dec, mutatingProfile))
 	wh.Register(mutatingMutatingWebhookPath, NewPodMutator(mgr.GetClient(), ctrl.Log.WithName(mutatingMutatingWebhookPath), dec, mutatingProfile))
