@@ -118,6 +118,9 @@ var _ = BeforeSuite(func() {
 			"SYSLOG",
 		},
 		NonCoreVolumeTypes: true,
+		AllowedSysctls: []string{
+			"net.core.somaxconn",
+		},
 		AllowedHostPorts: []validators.PortRange{
 			{
 				Min: 65500,
@@ -139,6 +142,9 @@ var _ = BeforeSuite(func() {
 			"SYSLOG",
 		},
 		NonCoreVolumeTypes: true,
+		AllowedSysctls: []string{
+			"net.core.somaxconn",
+		},
 		AllowedHostPaths: []validators.AllowedHostPath{
 			{
 				PathPrefix: "/etc/hos", // not "host"

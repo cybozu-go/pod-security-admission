@@ -61,7 +61,7 @@ func createValidators(prof SecurityProfile) []validators.Validator {
 		list = append(list, validators.NewDenyUnsafeProcMount(prof.ProcMountWithUserNamespace))
 	}
 	if !prof.Sysctls {
-		list = append(list, validators.DenyUnsafeSysctls{})
+		list = append(list, validators.NewDenyUnsafeSysctls(prof.AllowedSysctls))
 	}
 	if !prof.NonCoreVolumeTypes {
 		list = append(list, validators.DenyNonCoreVolumeTypes{})

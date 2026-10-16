@@ -8,21 +8,35 @@ import (
 	"k8s.io/apimachinery/pkg/util/validation/field"
 )
 
-var allowedSysctls = map[string]struct{}{
-	"kernel.shm_rmid_forced":              {},
-	"net.ipv4.ip_local_port_range":        {},
-	"net.ipv4.tcp_syncookies":             {},
-	"net.ipv4.ping_group_range":           {},
-	"net.ipv4.ip_unprivileged_port_start": {},
-	"net.ipv4.ip_local_reserved_ports":    {}, // since Kubernetes 1.27
-	"net.ipv4.tcp_keepalive_time":         {}, // since Kubernetes 1.29
-	"net.ipv4.tcp_fin_timeout":            {}, // since Kubernetes 1.29
-	"net.ipv4.tcp_keepalive_intvl":        {}, // since Kubernetes 1.29
-	"net.ipv4.tcp_keepalive_probes":       {}, // since Kubernetes 1.29
+// safe sysctls defined in Pod Security Standards
+var safeSysctls = []string{
+	"kernel.shm_rmid_forced",
+	"net.ipv4.ip_local_port_range",
+	"net.ipv4.tcp_syncookies",
+	"net.ipv4.ping_group_range",
+	"net.ipv4.ip_unprivileged_port_start",
+	"net.ipv4.ip_local_reserved_ports", // since Kubernetes 1.27
+	"net.ipv4.tcp_keepalive_time",      // since Kubernetes 1.29
+	"net.ipv4.tcp_fin_timeout",         // since Kubernetes 1.29
+	"net.ipv4.tcp_keepalive_intvl",     // since Kubernetes 1.29
+	"net.ipv4.tcp_keepalive_probes",    // since Kubernetes 1.29
 }
 
 // DenyUnsafeSysctls is a Validator that denies usage of unsafe sysctls
-type DenyUnsafeSysctls struct{}
+type DenyUnsafeSysctls struct {
+	allowedSysctls map[string]struct{}
+}
+
+func NewDenyUnsafeSysctls(sysctls []string) DenyUnsafeSysctls {
+	allowedSysctls := make(map[string]struct{})
+	for _, s := range safeSysctls {
+		allowedSysctls[s] = struct{}{}
+	}
+	for _, s := range sysctls {
+		allowedSysctls[s] = struct{}{}
+	}
+	return DenyUnsafeSysctls{allowedSysctls: allowedSysctls}
+}
 
 func (v DenyUnsafeSysctls) Validate(ctx context.Context, pod *corev1.Pod) field.ErrorList {
 	p := field.NewPath("spec")
@@ -32,7 +46,7 @@ func (v DenyUnsafeSysctls) Validate(ctx context.Context, pod *corev1.Pod) field.
 		return errs
 	}
 	for i, sysctl := range pod.Spec.SecurityContext.Sysctls {
-		if _, ok := allowedSysctls[sysctl.Name]; !ok {
+		if _, ok := v.allowedSysctls[sysctl.Name]; !ok {
 			errs = append(errs, field.Forbidden(p.Child("securityContext", "sysctls").Index(i), fmt.Sprintf("Setting sysctl %s is not allowed", sysctl.Name)))
 		}
 	}
