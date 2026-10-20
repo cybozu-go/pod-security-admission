@@ -119,7 +119,7 @@ var _ = BeforeSuite(func() {
 		},
 		NonCoreVolumeTypes: true,
 		AllowedSysctls: []string{
-			"net.core.somaxconn",
+			"net.core.rmem_max",
 		},
 		AllowedHostPorts: []validators.PortRange{
 			{
@@ -143,7 +143,7 @@ var _ = BeforeSuite(func() {
 		},
 		NonCoreVolumeTypes: true,
 		AllowedSysctls: []string{
-			"net.core.somaxconn",
+			"net.core.rmem_max",
 		},
 		AllowedHostPaths: []validators.AllowedHostPath{
 			{

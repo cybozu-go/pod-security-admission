@@ -68,7 +68,7 @@ The profile describes only the allowed items. A false or no description indicate
 ```
 
 Administrators can customize the profile if needed.
-The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET_ADMIN` capabilities, use of hostPorts from 1024 to 65535, and use of `net.core.somaxconn` sysctl.
+The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET_ADMIN` capabilities, use of hostPorts from 1024 to 65535, and use of `net.core.rmem_max` sysctl.
 
 ```yaml
 - name: baseline
@@ -81,7 +81,7 @@ The following `Baseline` profile allows hostNamespaces, to add `SYSLOG` and `NET
     - min: 1024
       max: 65535
   allowedSysctls:
-    - net.core.somaxconn
+    - net.core.rmem_max
   allowPrivilegeEscalation: true
   rootGroups: true
   runAsRoot: true

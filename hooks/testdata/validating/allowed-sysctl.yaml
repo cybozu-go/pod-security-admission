@@ -6,15 +6,15 @@ metadata:
     expected.pod-security.cybozu.com/baseline: ""
     expected.pod-security.cybozu.com/hostpath: ""
     expected.pod-security.cybozu.com/privileged: ""
-    expected.pod-security.cybozu.com/restricted: "denied the request: spec.securityContext.sysctls[1]: Forbidden: Setting sysctl net.core.somaxconn is not allowed"
+    expected.pod-security.cybozu.com/restricted: "denied the request: spec.securityContext.sysctls[1]: Forbidden: Setting sysctl net.core.rmem_max is not allowed"
 spec:
   securityContext:
     runAsNonRoot: true
     sysctls:
       - name: kernel.shm_rmid_forced
         value: "1"
-      - name: net.core.somaxconn
-        value: "1024"
+      - name: net.core.rmem_max
+        value: "4194304"
   containers:
     - name: ubuntu
       image: ghcr.io/cybozu/ubuntu
