@@ -20,6 +20,7 @@ type SecurityProfile struct {
 	ProcMount                  bool                         `json:"procMount"`
 	ProcMountWithUserNamespace bool                         `json:"procMountWithUserNamespace"`
 	Sysctls                    bool                         `json:"sysctls"`
+	AllowedSysctls             []string                     `json:"allowedSysctls"`
 	AllowPrivilegeEscalation   bool                         `json:"allowPrivilegeEscalation"`
 	RunAsRoot                  bool                         `json:"runAsRoot"`
 	RunAsRootWithUserNamespace bool                         `json:"runAsRootWithUserNamespace"`
