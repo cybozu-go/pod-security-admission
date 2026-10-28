@@ -23,6 +23,10 @@ spec:
         value: "60"
       - name: net.ipv4.tcp_keepalive_probes
         value: "5"
+      - name: net.ipv4.tcp_rmem
+        value: "4096 87380 6291456"
+      - name: net.ipv4.tcp_wmem
+        value: "4096 16384 4194304"
   containers:
     - name: ubuntu
       image: ghcr.io/cybozu/ubuntu

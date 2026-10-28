@@ -20,6 +20,8 @@ var safeSysctls = []string{
 	"net.ipv4.tcp_fin_timeout",         // since Kubernetes 1.29
 	"net.ipv4.tcp_keepalive_intvl",     // since Kubernetes 1.29
 	"net.ipv4.tcp_keepalive_probes",    // since Kubernetes 1.29
+	"net.ipv4.tcp_rmem",                // since Kubernetes 1.32
+	"net.ipv4.tcp_wmem",                // since Kubernetes 1.32
 }
 
 // DenyUnsafeSysctls is a Validator that denies usage of unsafe sysctls
