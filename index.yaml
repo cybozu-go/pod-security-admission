@@ -2,6 +2,16 @@ apiVersion: v1
 entries:
   pod-security-admission:
   - apiVersion: v2
+    appVersion: 0.13.0
+    created: "2026-10-28T09:29:31.089643512Z"
+    description: A Helm chart for Kubernetes
+    digest: 1d5af200d21728762da6b55536732f63fdcad7b8cc9765934f0679476b3c460c
+    name: pod-security-admission
+    type: application
+    urls:
+    - https://github.com/cybozu-go/pod-security-admission/releases/download/pod-security-admission-chart-0.1.13/pod-security-admission-0.1.13.tgz
+    version: 0.1.13
+  - apiVersion: v2
     appVersion: 0.12.3
     created: "2026-10-16T02:46:46.605869606Z"
     description: A Helm chart for Kubernetes
@@ -131,4 +141,4 @@ entries:
     urls:
     - https://github.com/cybozu-go/pod-security-admission/releases/download/pod-security-admission-chart-0.1.0/pod-security-admission-0.1.0.tgz
     version: 0.1.0
-generated: "2026-10-16T02:46:46.605968852Z"
+generated: "2026-10-28T09:29:31.089696663Z"
